@@ -1,1325 +1,1356 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#050510">
-    <title>Webistzu — Payment Portal</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-/* ================================================================
-   CSS VARIABLES
-================================================================ */
-:root {
-    --bg:          #050510;
-    --glass:       rgba(255,255,255,0.04);
-    --glass-b:     rgba(255,255,255,0.08);
-    --glass-bd:    rgba(255,255,255,0.09);
-    --p1:          #7c3aed;
-    --p2:          #2563eb;
-    --grad:        linear-gradient(135deg,#7c3aed,#2563eb);
-    --glow:        rgba(124,58,237,0.35);
-    --tx:          #f1f5f9;
-    --tx2:         #94a3b8;
-    --tx3:         #64748b;
-    --ok:          #10b981;
-    --err:         #ef4444;
-    --r:           16px;
-    --rs:          10px;
-    --ease:        all 0.3s cubic-bezier(0.4,0,0.2,1);
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Webistzu — Client Portal</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --bg:#07071a;--bg2:#0d0d2b;--bg3:#12122e;
+  --side:#080820;--side-w:250px;
+  --p1:#7c3aed;--p2:#4f46e5;--p3:#06b6d4;
+  --green:#10b981;--red:#ef4444;--yellow:#f59e0b;--orange:#f97316;
+  --text:#e2e8f0;--muted:#94a3b8;--border:rgba(255,255,255,.08);
+  --glass:rgba(255,255,255,.04);--glass2:rgba(255,255,255,.08);
+  --shadow:0 8px 32px rgba(0,0,0,.4);
+  --r:12px;--r2:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
 
-    /* Fluid spacing tokens */
-    --pad-card:    clamp(18px, 4vw, 36px);
-    --gap-form:    clamp(14px, 2.5vw, 20px);
-}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--p1);border-radius:3px}
 
-/* ================================================================
-   RESET & BASE
-================================================================ */
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; -webkit-tap-highlight-color:transparent; }
-body {
-    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-    background:var(--bg); color:var(--tx);
-    min-height:100vh; overflow-x:hidden;
-    /* safe-area-inset for notched phones */
-    padding-left:  env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
+/* ── Login ── */
+#login-screen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 20% 50%,rgba(124,58,237,.18) 0%,transparent 60%),
+             radial-gradient(ellipse at 80% 50%,rgba(79,70,229,.15) 0%,transparent 60%),var(--bg);
+  padding:16px;
 }
+.login-card{
+  width:100%;max-width:440px;
+  background:rgba(13,13,43,.9);border:1px solid var(--border);
+  border-radius:20px;padding:40px 36px;backdrop-filter:blur(20px);
+  box-shadow:var(--shadow),0 0 60px rgba(124,58,237,.12);
+}
+.login-logo{text-align:center;margin-bottom:28px;}
+.login-logo .brand{font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--p1),var(--p3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.login-logo p{color:var(--muted);font-size:13px;margin-top:4px;}
+.tab-row{display:flex;gap:4px;background:var(--glass);border-radius:10px;padding:4px;margin-bottom:28px;}
+.tab-btn{flex:1;padding:9px;border:none;background:transparent;color:var(--muted);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;transition:.2s;}
+.tab-btn.active{background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;}
+.form-group{margin-bottom:18px;}
+.form-group label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+.form-group input{
+  width:100%;padding:11px 14px;background:var(--glass);border:1px solid var(--border);
+  border-radius:var(--r2);color:var(--text);font-size:14px;outline:none;transition:.2s;
+}
+.form-group input:focus{border-color:var(--p1);background:var(--glass2);}
+.btn-primary{
+  width:100%;padding:13px;background:linear-gradient(135deg,var(--p1),var(--p2));
+  border:none;border-radius:var(--r2);color:#fff;font-size:15px;font-weight:700;
+  cursor:pointer;transition:.2s;min-height:44px;
+}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px);}
+.demo-creds{margin-top:20px;padding:14px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.2);border-radius:var(--r2);}
+.demo-creds p{font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:700;letter-spacing:.5px;}
+.demo-creds span{font-size:12px;color:var(--text);display:block;line-height:1.8;}
 
-/* ================================================================
-   ANIMATED BACKGROUND
-================================================================ */
-.bg-wrap {
-    position:fixed; inset:0; z-index:0; pointer-events:none;
-    background:
-        radial-gradient(ellipse 70% 55% at 15% 20%, rgba(124,58,237,0.16) 0%, transparent 60%),
-        radial-gradient(ellipse 55% 45% at 85% 85%, rgba(37,99,235,0.11) 0%, transparent 60%),
-        radial-gradient(ellipse 45% 65% at 50% 50%, rgba(139,92,246,0.05) 0%, transparent 70%);
-}
-.grid-bg {
-    position:fixed; inset:0; z-index:0; pointer-events:none;
-    background-image:
-        linear-gradient(rgba(255,255,255,0.013) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.013) 1px, transparent 1px);
-    background-size:52px 52px;
-}
-#particles { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
-.p-dot { position:absolute; border-radius:50%; animation:floatUp linear infinite; }
-@keyframes floatUp {
-    0%   { transform:translateY(108vh) scale(0); opacity:0; }
-    6%   { opacity:1; }
-    94%  { opacity:0.7; }
-    100% { transform:translateY(-12vh) scale(1); opacity:0; }
-}
+/* ── App shell ── */
+#app{display:none;height:100vh;overflow:hidden;}
+#app.visible{display:flex;}
 
-/* ================================================================
-   LAYOUT
-================================================================ */
-.wrap {
-    max-width:900px; margin:0 auto;
-    padding:0 clamp(14px, 4vw, 24px);
-    position:relative; z-index:1;
+/* ── Sidebar ── */
+.sidebar{
+  width:var(--side-w);flex-shrink:0;background:var(--side);
+  border-right:1px solid var(--border);display:flex;flex-direction:column;
+  height:100vh;overflow-y:auto;position:relative;z-index:100;transition:.3s;
 }
+.sidebar-logo{padding:22px 20px 14px;border-bottom:1px solid var(--border);}
+.sidebar-logo .brand{font-size:22px;font-weight:800;background:linear-gradient(135deg,var(--p1),var(--p3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.sidebar-logo .role-badge{font-size:10px;background:rgba(124,58,237,.2);color:var(--p1);padding:2px 8px;border-radius:20px;display:inline-block;margin-top:4px;font-weight:700;}
+.sidebar-section{padding:10px 0;}
+.sidebar-section-label{font-size:10px;color:var(--muted);padding:8px 20px 4px;letter-spacing:1px;font-weight:700;text-transform:uppercase;}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:10px 20px;
+  color:var(--muted);font-size:13px;font-weight:500;
+  cursor:pointer;transition:.15s;border-left:3px solid transparent;
+  border:none;background:none;width:100%;text-align:left;
+}
+.nav-item:hover{color:var(--text);background:var(--glass);}
+.nav-item.active{color:#fff;background:rgba(124,58,237,.15);border-left-color:var(--p1);}
+.nav-item .icon{font-size:16px;width:20px;text-align:center;}
+.nav-item .badge{margin-left:auto;background:var(--p1);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;}
+.sidebar-footer{margin-top:auto;padding:16px 20px;border-top:1px solid var(--border);}
+.user-info{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--p1),var(--p2));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;}
+.user-info .name{font-size:13px;font-weight:600;}
+.user-info .email{font-size:11px;color:var(--muted);}
+.btn-logout{width:100%;padding:8px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--red);border-radius:var(--r2);cursor:pointer;font-size:12px;font-weight:600;transition:.2s;}
+.btn-logout:hover{background:rgba(239,68,68,.2);}
 
-/* ================================================================
-   HEADER
-================================================================ */
-header {
-    text-align:center;
-    padding:clamp(32px,7vw,60px) clamp(14px,4vw,24px) clamp(24px,5vw,40px);
-    position:relative; z-index:1;
-}
-.logo-row {
-    display:inline-flex; align-items:center;
-    gap:clamp(10px,2.5vw,14px); margin-bottom:12px;
-    animation:fadeDown 0.8s ease-out;
-}
-.logo-icon {
-    width:clamp(44px,10vw,56px); height:clamp(44px,10vw,56px);
-    background:var(--grad); border-radius:clamp(12px,3vw,15px);
-    display:flex; align-items:center; justify-content:center;
-    box-shadow:0 0 28px var(--glow);
-    animation:glowPulse 3s ease-in-out infinite;
-    flex-shrink:0;
-}
-.logo-icon svg { width:55%; height:55%; }
-.logo-name {
-    font-size:clamp(26px,6vw,36px); font-weight:900; letter-spacing:-0.5px;
-    background:var(--grad);
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-    background-clip:text;
-}
-.tagline {
-    color:var(--tx3); font-size:clamp(12px,2.5vw,14px); font-weight:400;
-    letter-spacing:0.5px; animation:fadeUp 1s ease-out 0.2s both;
-}
-@keyframes glowPulse {
-    0%,100% { box-shadow:0 0 20px var(--glow); }
-    50%      { box-shadow:0 0 48px rgba(124,58,237,0.55),0 0 80px rgba(124,58,237,0.12); }
-}
-@keyframes fadeDown { from{opacity:0;transform:translateY(-16px)} to{opacity:1;transform:translateY(0)} }
-@keyframes fadeUp   { from{opacity:0;transform:translateY(16px)}  to{opacity:1;transform:translateY(0)} }
+/* ── Main ── */
+.main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{height:60px;padding:0 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);flex-shrink:0;gap:12px;}
+.topbar-left{display:flex;align-items:center;gap:12px;}
+.hamburger{display:none;background:none;border:none;color:var(--text);font-size:20px;cursor:pointer;padding:4px;}
+.page-title{font-size:17px;font-weight:700;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.icon-btn{background:var(--glass);border:1px solid var(--border);color:var(--text);width:36px;height:36px;border-radius:var(--r2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:.2s;position:relative;}
+.icon-btn:hover{background:var(--glass2);}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--red);border-radius:50%;}
+.content{flex:1;overflow-y:auto;padding:24px;}
 
-/* ================================================================
-   PROGRESS STEPS
-================================================================ */
-.progress-bar {
-    display:flex; align-items:center; justify-content:center;
-    max-width:420px; margin:0 auto clamp(28px,6vw,48px);
-    padding:0 clamp(10px,3vw,20px);
-    animation:fadeUp 0.8s ease-out 0.1s both;
-}
-.s-item { display:flex; flex-direction:column; align-items:center; gap:7px; position:relative; z-index:1; }
-.s-circle {
-    width:clamp(36px,9vw,44px); height:clamp(36px,9vw,44px); border-radius:50%;
-    border:2px solid var(--glass-bd);
-    background:var(--glass);
-    display:flex; align-items:center; justify-content:center;
-    font-size:clamp(12px,3vw,14px); font-weight:700; color:var(--tx3);
-    transition:var(--ease); backdrop-filter:blur(10px);
-    flex-shrink:0;
-}
-.s-item.active .s-circle {
-    background:var(--grad); border-color:transparent; color:#fff;
-    box-shadow:0 0 22px var(--glow);
-}
-.s-item.done .s-circle {
-    background:linear-gradient(135deg,#059669,#10b981);
-    border-color:transparent; color:#fff;
-}
-.s-label {
-    font-size:clamp(9px,2.2vw,11px); color:var(--tx3);
-    font-weight:500; white-space:nowrap; transition:var(--ease);
-}
-.s-item.active .s-label { color:var(--tx2); }
-.s-line { flex:1; height:2px; background:var(--glass-bd); margin-bottom:clamp(20px,5vw,26px); transition:var(--ease); }
-.s-line.done { background:linear-gradient(90deg,#059669,#10b981); }
+/* ── Cards ── */
+.card{background:var(--glass);border:1px solid var(--border);border-radius:var(--r);padding:20px;}
+.card-title{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:16px;text-transform:uppercase;letter-spacing:.5px;}
 
-/* Hide step labels on very small screens */
-@media (max-width:360px) {
-    .s-label { display:none; }
-    .progress-bar { max-width:200px; }
-}
+/* ── Stats ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px;}
+.stat-card{background:var(--glass);border:1px solid var(--border);border-radius:var(--r);padding:20px;position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.15;}
+.stat-card.purple::before{background:var(--p1);}
+.stat-card.blue::before{background:var(--p2);}
+.stat-card.green::before{background:var(--green);}
+.stat-card.orange::before{background:var(--orange);}
+.stat-icon{font-size:24px;margin-bottom:10px;}
+.stat-label{font-size:12px;color:var(--muted);font-weight:600;}
+.stat-value{font-size:26px;font-weight:800;margin:4px 0;}
+.stat-change{font-size:11px;color:var(--green);}
 
-/* ================================================================
-   GLASS CARD
-================================================================ */
-.card {
-    background:var(--glass);
-    backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
-    border:1px solid var(--glass-bd); border-radius:var(--r);
-    padding:var(--pad-card); margin-bottom:clamp(16px,3vw,24px);
-    transition:var(--ease);
-}
-.card:hover { border-color:rgba(124,58,237,0.2); }
+/* ── Tables ── */
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;padding:10px 14px;color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);}
+td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.04);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--glass);}
 
-/* ================================================================
-   SECTION HEADER
-================================================================ */
-.sec-head { display:flex; align-items:center; gap:12px; margin-bottom:clamp(20px,4vw,32px); }
-.sec-icon {
-    width:clamp(36px,8vw,44px); height:clamp(36px,8vw,44px); flex-shrink:0;
-    background:var(--grad); border-radius:clamp(9px,2vw,12px);
-    display:flex; align-items:center; justify-content:center;
-    box-shadow:0 4px 14px var(--glow);
-}
-.sec-icon svg { width:44%; height:44%; stroke:#fff; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
-.sec-title { font-size:clamp(17px,4vw,20px); font-weight:700; }
-.sec-sub   { font-size:clamp(11px,2.5vw,13px); color:var(--tx3); margin-top:3px; }
+/* ── Badges ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.badge.green{background:rgba(16,185,129,.15);color:var(--green);}
+.badge.yellow{background:rgba(245,158,11,.15);color:var(--yellow);}
+.badge.red{background:rgba(239,68,68,.15);color:var(--red);}
+.badge.blue{background:rgba(79,70,229,.15);color:#818cf8;}
+.badge.purple{background:rgba(124,58,237,.15);color:#a78bfa;}
+.badge.orange{background:rgba(249,115,22,.15);color:var(--orange);}
+.badge::before{content:'●';font-size:7px;}
 
-/* ================================================================
-   FORM GRID & INPUTS
-================================================================ */
-.fgrid { display:grid; grid-template-columns:1fr 1fr; gap:var(--gap-form); }
-.fgrid .fw { grid-column:1/-1; }
-.fgroup { display:flex; flex-direction:column; gap:7px; }
-.flabel { font-size:clamp(11px,2.5vw,13px); font-weight:500; color:var(--tx2); }
-.finput, .fselect {
-    background:rgba(255,255,255,0.03);
-    border:1px solid var(--glass-bd); border-radius:var(--rs);
-    padding:clamp(11px,2.5vw,13px) 16px;
-    color:var(--tx); font-family:inherit; font-size:clamp(13px,3vw,14px);
-    transition:var(--ease); outline:none; width:100%;
-    -webkit-appearance:none; min-height:48px;
-}
-.finput:focus, .fselect:focus {
-    border-color:var(--p1);
-    background:rgba(124,58,237,0.07);
-    box-shadow:0 0 0 3px rgba(124,58,237,0.14);
-}
-.finput::placeholder { color:var(--tx3); }
-.finput.err { border-color:var(--err)!important; box-shadow:0 0 0 3px rgba(239,68,68,0.14)!important; }
-.fselect.err { border-color:var(--err)!important; box-shadow:0 0 0 3px rgba(239,68,68,0.14)!important; }
-.fselect option { background:#12122a; color:var(--tx); }
-.amt-wrap { position:relative; }
-.amt-pfx {
-    position:absolute; left:14px; top:50%; transform:translateY(-50%);
-    color:var(--tx2); font-weight:700; font-size:16px; pointer-events:none; z-index:1;
-}
-.amt-wrap .finput { padding-left:30px; }
-.field-hint { font-size:11px; color:var(--tx3); margin-top:4px; }
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--r2);border:none;cursor:pointer;font-size:13px;font-weight:600;transition:.2s;min-height:36px;}
+.btn-sm{padding:6px 12px;font-size:12px;min-height:32px;}
+.btn-grad{background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;}
+.btn-grad:hover{opacity:.9;}
+.btn-ghost{background:var(--glass);border:1px solid var(--border);color:var(--text);}
+.btn-ghost:hover{background:var(--glass2);}
+.btn-green{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--green);}
+.btn-red{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--red);}
 
-@media (max-width:540px) { .fgrid { grid-template-columns:1fr; } }
+/* ── Fields ── */
+.form-row{display:grid;gap:16px;margin-bottom:16px;}
+.form-row.cols-2{grid-template-columns:1fr 1fr;}
+.form-row.cols-3{grid-template-columns:1fr 1fr 1fr;}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600;}
+.field input,.field select,.field textarea{width:100%;padding:10px 14px;background:var(--glass);border:1px solid var(--border);border-radius:var(--r2);color:var(--text);font-size:13px;outline:none;font-family:inherit;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--p1);}
+.field select option{background:var(--bg2);}
+.field textarea{resize:vertical;min-height:80px;}
 
-/* ================================================================
-   BUTTONS
-================================================================ */
-.btn {
-    display:inline-flex; align-items:center; justify-content:center; gap:7px;
-    padding:clamp(10px,2.5vw,12px) clamp(16px,3vw,22px);
-    border-radius:var(--rs); font-family:inherit;
-    font-size:clamp(13px,3vw,14px); font-weight:600;
-    cursor:pointer; transition:var(--ease); border:none; outline:none;
-    text-decoration:none; white-space:nowrap; user-select:none;
-    min-height:44px; /* touch target */
-}
-.btn-primary {
-    background:var(--grad); color:#fff;
-    box-shadow:0 4px 18px var(--glow);
-}
-.btn-primary:hover  { transform:translateY(-2px); box-shadow:0 8px 28px rgba(124,58,237,0.45); }
-.btn-primary:active { transform:translateY(0); }
-.btn-glass {
-    background:var(--glass-b); border:1px solid var(--glass-bd); color:var(--tx2);
-    backdrop-filter:blur(10px);
-}
-.btn-glass:hover { background:rgba(255,255,255,0.1); border-color:rgba(124,58,237,0.28); color:var(--tx); }
-.btn-ok {
-    background:linear-gradient(135deg,#059669,#10b981); color:#fff;
-    box-shadow:0 4px 18px rgba(16,185,129,0.3);
-}
-.btn-ok:hover  { transform:translateY(-2px); box-shadow:0 8px 28px rgba(16,185,129,0.45); }
-.btn-lg { padding:clamp(12px,3vw,15px) clamp(20px,4vw,32px); font-size:clamp(14px,3.5vw,15px); border-radius:12px; }
-.btn-sm { padding:7px 13px; font-size:12px; border-radius:7px; min-height:36px; }
-.btn-block { width:100%; }
-.btn-row { display:flex; gap:12px; margin-top:clamp(22px,4vw,30px); flex-wrap:wrap; }
-.btn-row .btn { flex:1; min-width:clamp(110px,25vw,140px); }
+/* ── Payment ── */
+.pay-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.upi-box{background:linear-gradient(135deg,rgba(124,58,237,.1),rgba(79,70,229,.1));border:1px solid rgba(124,58,237,.2);border-radius:var(--r);padding:20px;}
+.upi-id-display{background:var(--glass);border:1px solid var(--border);border-radius:var(--r2);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;margin:12px 0;font-family:monospace;font-size:14px;}
+.qr-box{background:var(--glass);border:1px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;}
+#qr-container{display:inline-block;background:#fff;padding:12px;border-radius:8px;margin:12px 0;}
+.amount-display{font-size:32px;font-weight:800;background:linear-gradient(135deg,var(--p1),var(--p3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:8px 0;}
 
-@media (max-width:400px) {
-    .btn-row { flex-direction:column; }
-    .btn-row .btn { min-width:unset; }
-}
+/* ── Upload ── */
+.upload-zone{border:2px dashed var(--border);border-radius:var(--r);padding:32px 20px;text-align:center;cursor:pointer;transition:.2s;background:var(--glass);}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--p1);background:rgba(124,58,237,.05);}
+.upload-zone .icon{font-size:36px;margin-bottom:8px;}
+.upload-zone p{color:var(--muted);font-size:13px;}
+#file-preview{max-width:100%;max-height:160px;border-radius:var(--r2);margin-top:10px;display:none;}
 
-/* ================================================================
-   UPI DISPLAY
-================================================================ */
-.upi-box {
-    background:rgba(124,58,237,0.07);
-    border:1px solid rgba(124,58,237,0.2);
-    border-radius:var(--rs);
-    padding:clamp(12px,3vw,16px) clamp(14px,3vw,20px);
-    display:flex; align-items:center; justify-content:space-between;
-    gap:10px; flex-wrap:wrap;
-}
-.upi-id  { font-size:clamp(15px,4vw,19px); font-weight:700; letter-spacing:0.3px; word-break:break-all; }
-.upi-lbl { font-size:10px; color:var(--tx3); text-transform:uppercase; letter-spacing:1px; margin-top:2px; }
-.upi-link-code {
-    background:rgba(0,0,0,0.35); border:1px solid var(--glass-bd);
-    border-radius:7px; padding:9px 13px; font-size:10px; color:var(--tx3);
-    font-family:monospace; word-break:break-all; margin-top:10px; line-height:1.55;
-    max-height:56px; overflow:hidden;
-}
+/* ── Tracker ── */
+.tracker{display:flex;align-items:flex-start;}
+.tracker-step{flex:1;text-align:center;position:relative;}
+.tracker-step::before{content:'';position:absolute;top:18px;left:50%;width:100%;height:2px;background:var(--border);}
+.tracker-step:last-child::before{display:none;}
+.tracker-dot{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:14px;position:relative;z-index:1;}
+.tracker-step.done .tracker-dot{background:var(--green);border-color:var(--green);}
+.tracker-step.active .tracker-dot{background:linear-gradient(135deg,var(--p1),var(--p2));border-color:var(--p1);box-shadow:0 0 16px rgba(124,58,237,.4);}
+.tracker-step.done::before{background:var(--green);}
+.tracker-step p{font-size:11px;color:var(--muted);font-weight:600;}
+.tracker-step.done p,.tracker-step.active p{color:var(--text);}
 
-/* ================================================================
-   PAY BUTTON (animated gradient)
-================================================================ */
-.pay-btn {
-    display:flex; align-items:center; justify-content:center; gap:9px;
-    width:100%; margin-top:16px; padding:clamp(14px,3.5vw,16px) 12px;
-    background:linear-gradient(135deg,#7c3aed,#2563eb,#7c3aed);
-    background-size:200% 200%;
-    animation:gradShift 4s ease infinite;
-    border:none; border-radius:12px; color:#fff;
-    font-size:clamp(14px,3.5vw,16px); font-weight:700;
-    cursor:pointer; font-family:inherit; text-decoration:none;
-    box-shadow:0 6px 24px rgba(124,58,237,0.42);
-    transition:transform 0.3s ease, box-shadow 0.3s ease;
-    min-height:52px;
-}
-.pay-btn:hover  { transform:translateY(-3px); box-shadow:0 10px 34px rgba(124,58,237,0.55); }
-.pay-btn:active { transform:translateY(0); }
-@keyframes gradShift {
-    0%,100% { background-position:0% 50%; }
-    50%      { background-position:100% 50%; }
-}
+/* ── Pricing ── */
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-top:24px;}
+.price-card{background:var(--glass);border:1px solid var(--border);border-radius:var(--r);padding:28px;position:relative;transition:.2s;}
+.price-card.featured{border-color:var(--p1);background:rgba(124,58,237,.08);}
+.price-card.featured::before{content:'Most Popular';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;font-size:11px;font-weight:700;padding:3px 14px;border-radius:20px;}
+.price-name{font-size:18px;font-weight:800;margin-bottom:4px;}
+.price-desc{font-size:12px;color:var(--muted);margin-bottom:20px;}
+.price-amount{font-size:38px;font-weight:800;}
+.price-amount span{font-size:16px;color:var(--muted);font-weight:400;}
+.price-features{list-style:none;margin:20px 0 24px;}
+.price-features li{padding:6px 0;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);}
+.price-features li::before{content:'✓';color:var(--green);font-weight:800;}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:8px;}
+.toggle{width:48px;height:26px;background:var(--glass2);border-radius:13px;position:relative;cursor:pointer;border:1px solid var(--border);flex-shrink:0;}
+.toggle-thumb{width:20px;height:20px;background:var(--muted);border-radius:50%;position:absolute;top:2px;left:2px;transition:.2s;}
+.toggle.on .toggle-thumb{left:24px;background:var(--p1);}
+.toggle.on{background:rgba(124,58,237,.15);}
 
-/* ================================================================
-   UPI APP BADGES
-================================================================ */
-.app-badges {
-    display:flex; gap:7px; flex-wrap:wrap; margin-top:14px;
-}
-.app-badge {
-    display:flex; align-items:center; gap:5px;
-    padding:5px 10px;
-    background:var(--glass); border:1px solid var(--glass-bd);
-    border-radius:20px; font-size:clamp(10px,2.2vw,11px); color:var(--tx3);
-    transition:var(--ease);
-}
-.app-badge:hover { border-color:rgba(124,58,237,0.3); color:var(--tx2); }
-.dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+/* ── Services ── */
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
+.service-card{background:var(--glass);border:1px solid var(--border);border-radius:var(--r);padding:22px;cursor:pointer;transition:.2s;}
+.service-card:hover{border-color:var(--p1);background:rgba(124,58,237,.06);}
+.service-icon{font-size:32px;margin-bottom:12px;}
+.service-name{font-size:15px;font-weight:700;margin-bottom:6px;}
+.service-desc{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:12px;}
+.service-price{font-size:14px;font-weight:700;color:var(--p3);}
 
-/* ================================================================
-   PAYMENT GRID — 2 col desktop, 1 col mobile
-================================================================ */
-.pay-grid {
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:clamp(16px,3vw,24px);
-    align-items:start;
+/* ── Quote ── */
+.quote-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--glass);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:8px;}
+.quote-item input[type=checkbox]{width:16px;height:16px;accent-color:var(--p1);}
+.quote-item-info{flex:1;}
+.quote-item-name{font-size:13px;font-weight:600;}
+.quote-item-price{font-size:12px;color:var(--muted);}
+.quote-total{background:linear-gradient(135deg,rgba(124,58,237,.1),rgba(79,70,229,.1));border:1px solid rgba(124,58,237,.2);border-radius:var(--r);padding:20px;margin-top:16px;}
+
+/* ── Notifications ── */
+.notif-list{display:flex;flex-direction:column;gap:10px;}
+.notif-item{display:flex;gap:12px;padding:14px;background:var(--glass);border:1px solid var(--border);border-radius:var(--r2);}
+.notif-item.unread{border-left:3px solid var(--p1);}
+.notif-icon{font-size:20px;flex-shrink:0;}
+.notif-content .title{font-size:13px;font-weight:600;margin-bottom:2px;}
+.notif-content .desc{font-size:12px;color:var(--muted);}
+.notif-content .time{font-size:11px;color:var(--muted);margin-top:4px;}
+
+/* ── FAQ ── */
+.faq-item{margin-bottom:8px;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;}
+.faq-q{padding:14px 16px;cursor:pointer;font-size:13px;font-weight:600;display:flex;justify-content:space-between;align-items:center;background:var(--glass);}
+.faq-q:hover{background:var(--glass2);}
+.faq-a{padding:0 16px;max-height:0;overflow:hidden;font-size:13px;color:var(--muted);line-height:1.7;transition:.3s;}
+.faq-a.open{padding:14px 16px;max-height:400px;}
+
+/* ── Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.modal-title{font-size:18px;font-weight:700;}
+.modal-close{background:var(--glass);border:1px solid var(--border);color:var(--text);width:32px;height:32px;border-radius:6px;cursor:pointer;font-size:16px;}
+
+/* ── Success popup ── */
+.success-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:2000;padding:16px;}
+.success-overlay.show{display:flex;}
+.success-card{background:var(--bg2);border:1px solid rgba(16,185,129,.3);border-radius:20px;padding:36px;text-align:center;max-width:420px;width:100%;}
+.success-icon{font-size:56px;margin-bottom:16px;}
+.success-card h2{font-size:22px;font-weight:800;margin-bottom:8px;}
+.success-card p{color:var(--muted);font-size:14px;line-height:1.6;}
+
+/* ── WhatsApp float ── */
+.wa-float{position:fixed;bottom:24px;right:24px;width:52px;height:52px;background:#25d366;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;box-shadow:0 4px 20px rgba(37,211,102,.4);z-index:500;transition:.2s;text-decoration:none;}
+.wa-float:hover{transform:scale(1.1);}
+
+/* ── Charts ── */
+.chart-grid{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-top:20px;}
+.chart-wrap{position:relative;height:260px;}
+
+/* ── Invoice print ── */
+.invoice-preview{background:#fff;color:#111;padding:40px;border-radius:var(--r);font-family:Arial,sans-serif;}
+.inv-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:30px;padding-bottom:20px;border-bottom:2px solid #7c3aed;}
+.inv-company{font-size:24px;font-weight:800;color:#7c3aed;}
+.inv-details{text-align:right;font-size:13px;color:#555;}
+.inv-to{margin-bottom:24px;}
+.inv-to h4{font-size:12px;color:#777;text-transform:uppercase;margin-bottom:4px;}
+.inv-table{width:100%;border-collapse:collapse;margin-bottom:24px;font-size:13px;}
+.inv-table th{background:#7c3aed;color:#fff;padding:10px 12px;text-align:left;}
+.inv-table td{padding:10px 12px;border-bottom:1px solid #eee;}
+.inv-total-row{font-weight:700;}
+.inv-footer{text-align:center;font-size:12px;color:#999;padding-top:20px;border-top:1px solid #eee;}
+
+/* ── Mobile sidebar overlay ── */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;}
+
+/* ── Responsive ── */
+@media(max-width:900px){
+  .chart-grid{grid-template-columns:1fr;}
+  .pay-grid{grid-template-columns:1fr;}
 }
-@media (max-width:767px) {
-    .pay-grid { grid-template-columns:1fr; }
+@media(max-width:768px){
+  :root{--side-w:260px;}
+  .sidebar{position:fixed;left:-260px;top:0;height:100%;z-index:200;transition:.3s;}
+  .sidebar.open{left:0;}
+  .sidebar-overlay.show{display:block;}
+  .hamburger{display:flex;}
+  .content{padding:16px;}
+  .topbar{padding:0 16px;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .form-row.cols-2,.form-row.cols-3{grid-template-columns:1fr;}
+  .pricing-grid{grid-template-columns:1fr;}
+  .services-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:480px){
+  .stats-grid{grid-template-columns:1fr;}
+  .services-grid{grid-template-columns:1fr;}
+  .login-card{padding:28px 20px;}
+  table{font-size:12px;}
+  th,td{padding:8px 10px;}
+}
+@media print{
+  .sidebar,.topbar,.wa-float,button{display:none!important;}
+  .content{overflow:visible;}
 }
 
-/* ================================================================
-   QR CODE
-================================================================ */
-.qr-wrap {
-    display:flex; flex-direction:column; align-items:center; gap:14px;
-    padding:clamp(16px,3vw,24px) clamp(14px,3vw,20px);
-    background:rgba(255,255,255,0.02); border:1px solid var(--glass-bd);
-    border-radius:var(--r); height:100%; min-height:200px;
-    justify-content:center;
-}
-/* On mobile, show QR inline (horizontal) to save vertical space */
-@media (max-width:767px) {
-    .qr-wrap {
-        flex-direction:row; align-items:center;
-        gap:18px; min-height:unset; padding:16px 18px;
-        justify-content:flex-start;
-    }
-    .qr-lbl { text-align:left; }
-}
-.qr-box {
-    width:clamp(130px,30vw,200px); height:clamp(130px,30vw,200px);
-    background:#fff; border-radius:12px; padding:8px;
-    display:flex; align-items:center; justify-content:center;
-    box-shadow:0 0 36px rgba(124,58,237,0.22);
-    animation:qrPulse 3s ease-in-out infinite;
-    flex-shrink:0; overflow:hidden;
-}
-@keyframes qrPulse {
-    0%,100% { box-shadow:0 0 28px rgba(124,58,237,0.18); }
-    50%      { box-shadow:0 0 48px rgba(124,58,237,0.38),0 0 70px rgba(37,99,235,0.12); }
-}
-#qrcode { display:flex; align-items:center; justify-content:center; width:100%; height:100%; }
-#qrcode canvas, #qrcode img { width:100%!important; height:100%!important; border-radius:4px; }
-.qr-lbl strong { font-size:clamp(13px,3vw,14px); color:var(--tx2); display:block; margin-bottom:4px; }
-.qr-lbl span   { font-size:clamp(11px,2.5vw,12px); color:var(--tx3); line-height:1.55; }
-
-/* ================================================================
-   INVOICE SUMMARY CARD
-================================================================ */
-.inv-card {
-    background:rgba(37,99,235,0.05);
-    border:1px solid rgba(37,99,235,0.12);
-    border-radius:var(--r); overflow:hidden;
-}
-.inv-head {
-    background:linear-gradient(135deg,rgba(124,58,237,0.16),rgba(37,99,235,0.12));
-    padding:clamp(14px,3vw,20px) clamp(16px,3.5vw,24px);
-    display:flex; justify-content:space-between; align-items:center;
-    flex-wrap:wrap; gap:10px;
-    border-bottom:1px solid rgba(124,58,237,0.1);
-}
-.inv-company { font-size:clamp(16px,4vw,20px); font-weight:800; }
-.inv-num     { font-size:12px; color:var(--tx3); font-family:monospace; margin-top:2px; }
-.inv-body    { padding:clamp(14px,3vw,20px) clamp(16px,3.5vw,24px); }
-.inv-row {
-    display:flex; justify-content:space-between; align-items:baseline;
-    padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.04);
-    gap:10px;
-}
-.inv-row:last-child { border:none; }
-.inv-k { color:var(--tx3); font-size:clamp(11px,2.5vw,13px); white-space:nowrap; flex-shrink:0; }
-.inv-v {
-    color:var(--tx); font-size:clamp(11px,2.5vw,13px); font-weight:500;
-    text-align:right; word-break:break-word; overflow-wrap:anywhere;
-    max-width:60%;
-}
-.inv-total {
-    padding:clamp(12px,3vw,16px) clamp(16px,3.5vw,24px);
-    background:rgba(124,58,237,0.09);
-    display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
-}
-.inv-total-lbl { font-size:clamp(13px,3vw,15px); font-weight:600; }
-.inv-total-amt {
-    font-size:clamp(22px,5.5vw,30px); font-weight:900;
-    background:var(--grad);
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-    background-clip:text;
-}
-
-/* ================================================================
-   UPLOAD ZONE
-================================================================ */
-.upload-zone {
-    border:2px dashed var(--glass-bd); border-radius:var(--r);
-    padding:clamp(20px,5vw,36px) clamp(16px,4vw,24px);
-    text-align:center; cursor:pointer;
-    transition:var(--ease); position:relative;
-}
-.upload-zone:hover, .upload-zone:focus-within { border-color:var(--p1); background:rgba(124,58,237,0.04); }
-.upload-zone.drag-over { border-color:var(--p1); background:rgba(124,58,237,0.07); transform:scale(1.01); }
-.upload-zone.has-file  { border-color:var(--ok); background:rgba(16,185,129,0.04); }
-.upload-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; z-index:2; }
-.upload-icon  { color:var(--tx3); margin-bottom:8px; }
-.upload-title { font-size:clamp(13px,3vw,14px); font-weight:600; color:var(--tx2); margin-bottom:4px; }
-.upload-hint  { font-size:clamp(11px,2.5vw,12px); color:var(--tx3); }
-.upload-preview { margin-top:14px; display:none; }
-.upload-preview img {
-    max-width:min(220px,70vw); max-height:150px;
-    border-radius:8px; border:1px solid var(--glass-bd); object-fit:contain;
-}
-.upload-fname {
-    font-size:11px; color:var(--ok); margin-top:8px;
-    display:flex; align-items:center; justify-content:center; gap:5px;
-    word-break:break-all;
-}
-
-/* ================================================================
-   DIVIDER & INFO BOX
-================================================================ */
-.divider { display:flex; align-items:center; gap:12px; margin:clamp(18px,4vw,24px) 0; }
-.div-line { flex:1; height:1px; background:var(--glass-bd); }
-.div-txt  { font-size:11px; color:var(--tx3); white-space:nowrap; }
-
-.info-box {
-    background:rgba(37,99,235,0.07); border:1px solid rgba(37,99,235,0.17);
-    border-radius:var(--rs); padding:clamp(12px,2.5vw,14px) clamp(13px,3vw,16px);
-    font-size:clamp(12px,2.8vw,13px); color:var(--tx2); line-height:1.65;
-    display:flex; gap:10px; align-items:flex-start;
-}
-.info-box svg { flex-shrink:0; margin-top:1px; stroke:#2563eb; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
-
-/* ================================================================
-   STEP VISIBILITY
-================================================================ */
-.sc { display:none; }
-.sc.on { display:block; animation:slideUp 0.4s ease-out; }
-@keyframes slideUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
-
-/* ================================================================
-   TOAST
-================================================================ */
-.toast {
-    position:fixed; bottom:28px; right:28px;
-    padding:12px 20px; border-radius:var(--rs);
-    font-size:13px; font-weight:500; z-index:9000;
-    transform:translateY(100px); opacity:0;
-    transition:all 0.35s cubic-bezier(0.4,0,0.2,1);
-    max-width:clamp(240px,80vw,300px); pointer-events:none;
-    line-height:1.4;
-}
-.toast.show { transform:translateY(0); opacity:1; }
-.toast-ok  { background:linear-gradient(135deg,#059669,#10b981); color:#fff; box-shadow:0 6px 24px rgba(16,185,129,0.35); }
-.toast-err { background:linear-gradient(135deg,#dc2626,#ef4444); color:#fff; box-shadow:0 6px 24px rgba(239,68,68,0.35); }
-.toast-warn { background:linear-gradient(135deg,#d97706,#f59e0b); color:#fff; box-shadow:0 6px 24px rgba(245,158,11,0.35); }
-
-@media (max-width:480px) {
-    .toast { left:14px; right:14px; bottom:16px; max-width:calc(100% - 28px); text-align:center; }
-}
-
-/* ================================================================
-   LOADING OVERLAY
-================================================================ */
-.loading {
-    position:fixed; inset:0;
-    background:rgba(5,5,16,0.88); backdrop-filter:blur(12px);
-    z-index:8000;
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px;
-    opacity:0; pointer-events:none; transition:var(--ease);
-}
-.loading.on { opacity:1; pointer-events:all; }
-.loading-content { text-align:center; }
-.spinner {
-    width:52px; height:52px; margin:0 auto 16px;
-    border:3px solid rgba(124,58,237,0.2); border-top-color:var(--p1);
-    border-radius:50%; animation:spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform:rotate(360deg); } }
-.load-txt  { color:var(--tx2); font-size:14px; animation:blink 1.5s ease-in-out infinite; }
-.load-sub  { color:var(--tx3); font-size:12px; margin-top:6px; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
-/* ================================================================
-   SUCCESS POPUP
-================================================================ */
-.overlay {
-    position:fixed; inset:0;
-    background:rgba(0,0,0,0.72); backdrop-filter:blur(12px);
-    z-index:7000;
-    display:flex; align-items:center; justify-content:center;
-    padding:clamp(12px,4vw,20px);
-    opacity:0; pointer-events:none; transition:var(--ease);
-}
-.overlay.on { opacity:1; pointer-events:all; }
-.success-box {
-    background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(5,150,105,0.04));
-    backdrop-filter:blur(24px);
-    border:1px solid rgba(16,185,129,0.25);
-    border-radius:24px;
-    padding:clamp(28px,6vw,52px) clamp(20px,5vw,44px);
-    text-align:center; max-width:460px; width:100%;
-    transform:scale(0.82); transition:var(--ease);
-    position:relative; overflow:hidden;
-}
-.overlay.on .success-box { transform:scale(1); }
-.s-icon {
-    width:clamp(64px,15vw,84px); height:clamp(64px,15vw,84px);
-    background:linear-gradient(135deg,#059669,#10b981); border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    margin:0 auto clamp(18px,4vw,26px);
-    box-shadow:0 0 48px rgba(16,185,129,0.45);
-    animation:popIn 0.55s cubic-bezier(0.34,1.56,0.64,1);
-}
-@keyframes popIn {
-    0%  { transform:scale(0) rotate(-30deg); }
-    60% { transform:scale(1.12) rotate(5deg); }
-    100%{ transform:scale(1) rotate(0); }
-}
-.s-icon svg { width:46%; height:46%; stroke:#fff; fill:none; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
-.s-title { font-size:clamp(22px,5vw,28px); font-weight:900; color:var(--ok); margin-bottom:10px; }
-.s-msg {
-    color:var(--tx2); font-size:clamp(13px,3vw,15px);
-    line-height:1.65; margin-bottom:clamp(20px,4vw,28px);
-}
-.s-ref {
-    background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.2);
-    border-radius:8px; padding:11px 16px;
-    margin-bottom:clamp(18px,4vw,26px);
-    font-family:monospace; font-size:clamp(11px,2.8vw,13px);
-    color:var(--ok); word-break:break-all; line-height:1.5;
-}
-.confetti-wrap {
-    position:absolute; top:0; left:0; width:100%; height:100%;
-    pointer-events:none; overflow:hidden; border-radius:24px;
-}
-.confetti-p {
-    position:absolute;
-    animation:confettiFall linear forwards;
-    border-radius:1px;
-}
-@keyframes confettiFall {
-    0%  { transform:translateY(-20px) rotate(0deg); opacity:1; }
-    100%{ transform:translateY(520px) rotate(720deg); opacity:0; }
-}
-
-/* ================================================================
-   FOOTER
-================================================================ */
-footer {
-    position:relative; z-index:1;
-    padding:clamp(32px,7vw,48px) clamp(14px,4vw,24px) clamp(24px,5vw,36px);
-    text-align:center;
-    border-top:1px solid var(--glass-bd);
-    margin-top:clamp(24px,5vw,40px);
-}
-.ft-logo {
-    font-size:clamp(20px,5vw,26px); font-weight:900;
-    background:var(--grad);
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-    background-clip:text; margin-bottom:6px;
-}
-.ft-tag   { font-size:clamp(11px,2.5vw,13px); color:var(--tx3); margin-bottom:20px; }
-.ft-badges {
-    display:flex; align-items:center; justify-content:center;
-    gap:clamp(8px,2vw,12px); margin-bottom:18px; flex-wrap:wrap;
-}
-.sec-badge {
-    display:flex; align-items:center; gap:5px;
-    padding:5px clamp(9px,2vw,13px);
-    background:var(--glass); border:1px solid var(--glass-bd);
-    border-radius:20px; font-size:clamp(10px,2.2vw,11px); color:var(--tx3);
-}
-.sec-badge svg { width:11px; height:11px; stroke:var(--ok); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
-.ft-links { display:flex; justify-content:center; gap:clamp(14px,3vw,22px); margin-bottom:16px; flex-wrap:wrap; }
-.ft-links a { color:var(--tx3); text-decoration:none; font-size:12px; transition:var(--ease); }
-.ft-links a:hover { color:var(--p1); }
-.ft-copy { font-size:11px; color:var(--tx3); }
-
-/* ================================================================
-   PRINT
-================================================================ */
-@media print {
-    .bg-wrap,.grid-bg,#particles,.progress-bar,.btn-row,footer { display:none!important; }
-    .card { border:1px solid #e2e8f0!important; background:#fff!important; }
-}
-    </style>
+/* ── Utility ── */
+.flex{display:flex;}.flex-center{display:flex;align-items:center;justify-content:center;}
+.items-center{align-items:center;}.justify-between{justify-content:space-between;}
+.gap-8{gap:8px;}.gap-12{gap:12px;}.gap-16{gap:16px;}
+.mb-8{margin-bottom:8px;}.mb-16{margin-bottom:16px;}.mb-24{margin-bottom:24px;}.mt-8{margin-top:8px;}.mt-16{margin-top:16px;}
+.text-muted{color:var(--muted);}.text-sm{font-size:13px;}.text-xs{font-size:11px;}
+.font-bold{font-weight:700;}.text-center{text-align:center;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.w-full{width:100%;}
+hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
+</style>
 </head>
 <body>
 
-<!-- ── Background ── -->
-<div class="bg-wrap"></div>
-<div class="grid-bg"></div>
-<div id="particles"></div>
-
-<!-- ── Loading ── -->
-<div class="loading" id="loadingEl">
-    <div class="loading-content">
-        <div class="spinner"></div>
-        <div class="load-txt">Uploading screenshot…</div>
-        <div class="load-sub">Please wait, do not close this page</div>
+<!-- ═══ LOGIN ═══ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="brand">Webistzu</div>
+      <p>Client &amp; Admin Portal</p>
     </div>
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="switchLoginTab('client')">Client Login</button>
+      <button class="tab-btn" onclick="switchLoginTab('admin')">Admin Login</button>
+    </div>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="login-email" placeholder="you@example.com" value="client@webistzu.com">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-pass" placeholder="••••••••" value="client123">
+    </div>
+    <div id="login-err" style="color:var(--red);font-size:12px;margin-bottom:12px;display:none;"></div>
+    <button class="btn-primary" onclick="doLogin()">Sign In →</button>
+    <div class="demo-creds">
+      <p>DEMO CREDENTIALS</p>
+      <span id="demo-hint">Client: client@webistzu.com / client123</span>
+    </div>
+  </div>
 </div>
 
-<!-- ── Success overlay ── -->
-<div class="overlay" id="successEl">
-    <div class="success-box">
-        <div class="confetti-wrap" id="confettiWrap"></div>
-        <div class="s-icon">
-            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <div class="s-title">Payment Submitted!</div>
-        <div class="s-msg">
-            Your screenshot has been saved and your payment is under review.<br>
-            You'll receive a confirmation within 24 hours.
-        </div>
-        <div class="s-ref" id="successRef">REF: WBZ-LOADING</div>
-        <button class="btn btn-ok btn-block btn-lg" onclick="closeSuccess()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            Done
+<!-- ═══ APP ═══ -->
+<div id="app">
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="brand">Webistzu</div>
+      <div class="role-badge" id="role-badge">Client</div>
+    </div>
+
+    <div id="client-nav">
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Main</div>
+        <button class="nav-item active" onclick="navigate('dashboard')" id="nav-dashboard"><span class="icon">🏠</span>Dashboard</button>
+        <button class="nav-item" onclick="navigate('invoices')" id="nav-invoices"><span class="icon">🧾</span>Invoices</button>
+        <button class="nav-item" onclick="navigate('payment')" id="nav-payment"><span class="icon">💳</span>Make Payment</button>
+        <button class="nav-item" onclick="navigate('status')" id="nav-status"><span class="icon">📊</span>Payment Status</button>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Explore</div>
+        <button class="nav-item" onclick="navigate('services')" id="nav-services"><span class="icon">⚙️</span>Services</button>
+        <button class="nav-item" onclick="navigate('pricing')" id="nav-pricing"><span class="icon">💰</span>Pricing</button>
+        <button class="nav-item" onclick="navigate('quote')" id="nav-quote"><span class="icon">📋</span>Get Quote</button>
+        <button class="nav-item" onclick="navigate('support')" id="nav-support"><span class="icon">💬</span>Support</button>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Account</div>
+        <button class="nav-item" onclick="navigate('notifications')" id="nav-notifications">
+          <span class="icon">🔔</span>Notifications<span class="badge" id="notif-badge">4</span>
         </button>
+        <button class="nav-item" onclick="navigate('profile')" id="nav-profile"><span class="icon">👤</span>Profile</button>
+      </div>
     </div>
+
+    <div id="admin-nav" style="display:none;">
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Admin Panel</div>
+        <button class="nav-item active" onclick="navigate('admin-dashboard')" id="nav-admin-dashboard"><span class="icon">📈</span>Analytics</button>
+        <button class="nav-item" onclick="navigate('admin-clients')" id="nav-admin-clients"><span class="icon">👥</span>Clients</button>
+        <button class="nav-item" onclick="navigate('admin-invoices')" id="nav-admin-invoices"><span class="icon">🧾</span>All Invoices</button>
+        <button class="nav-item" onclick="navigate('admin-payments')" id="nav-admin-payments"><span class="icon">💰</span>Payments</button>
+        <button class="nav-item" onclick="navigate('admin-quotes')" id="nav-admin-quotes"><span class="icon">📋</span>Quotations</button>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="avatar" id="user-avatar">C</div>
+        <div>
+          <div class="name" id="user-name">Client</div>
+          <div class="email" id="user-email">client@webistzu.com</div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Sign Out</button>
+    </div>
+  </aside>
+
+  <div class="main-area">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+        <div class="page-title" id="page-title">Dashboard</div>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn" onclick="navigate('notifications')" title="Notifications">
+          🔔<span class="notif-dot" id="notif-dot"></span>
+        </button>
+        <button class="icon-btn" onclick="navigate('profile')" title="Profile">👤</button>
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
 </div>
 
-<!-- ── Toast ── -->
-<div class="toast" id="toastEl"></div>
-
-<!-- ════════════════════════════════════════════
-     HEADER
-════════════════════════════════════════════ -->
-<header>
-    <div class="logo-row">
-        <div class="logo-icon">
-            <svg viewBox="0 0 32 32" fill="none">
-                <path d="M4 8L16 4L28 8V16C28 22.627 22.627 28 16 28C9.373 28 4 22.627 4 16V8Z"
-                      fill="rgba(255,255,255,0.18)" stroke="white" stroke-width="1.5"/>
-                <path d="M10 14L14 18L22 10" stroke="white" stroke-width="2.5"
-                      stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        </div>
-        <span class="logo-name">Webistzu</span>
+<!-- ═══ MODALS ═══ -->
+<div class="modal-overlay" id="invoice-modal">
+  <div class="modal" style="max-width:680px;">
+    <div class="modal-header">
+      <div class="modal-title">Invoice Details</div>
+      <button class="modal-close" onclick="closeModal('invoice-modal')">✕</button>
     </div>
-    <div class="tagline">Webpages. Web Presence. Webistzu.</div>
-</header>
-
-<!-- ════════════════════════════════════════════
-     PROGRESS STEPS
-════════════════════════════════════════════ -->
-<div class="progress-bar">
-    <div class="s-item active" id="si1">
-        <div class="s-circle">1</div>
-        <div class="s-label">Details</div>
-    </div>
-    <div class="s-line" id="sl1"></div>
-    <div class="s-item" id="si2">
-        <div class="s-circle">2</div>
-        <div class="s-label">Payment</div>
-    </div>
-    <div class="s-line" id="sl2"></div>
-    <div class="s-item" id="si3">
-        <div class="s-circle">3</div>
-        <div class="s-label">Confirm</div>
-    </div>
+    <div id="invoice-modal-body"></div>
+  </div>
 </div>
 
-<!-- ════════════════════════════════════════════
-     MAIN CONTENT
-════════════════════════════════════════════ -->
-<div class="wrap">
+<div class="success-overlay" id="pay-success">
+  <div class="success-card">
+    <div class="success-icon">✅</div>
+    <h2>Payment Submitted!</h2>
+    <p>Your screenshot and UTR have been received. Our team will verify and update the status within 2–4 hours.</p>
+    <div style="margin-top:20px;padding:14px;background:rgba(16,185,129,.1);border-radius:var(--r2);" id="success-ref"></div>
+    <button class="btn btn-grad w-full" style="margin-top:20px;" onclick="closePaySuccess()">Back to Dashboard</button>
+  </div>
+</div>
 
-    <!-- ════ STEP 1: CLIENT DETAILS ════ -->
-    <div class="sc on" id="sc1">
-        <div class="card">
-            <div class="sec-head">
-                <div class="sec-icon">
-                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                </div>
-                <div>
-                    <div class="sec-title">Client Details</div>
-                    <div class="sec-sub">Fill in your information to generate an invoice</div>
-                </div>
-            </div>
+<a class="wa-float" href="https://wa.me/919999999999" target="_blank" title="Chat on WhatsApp">💬</a>
 
-            <div class="fgrid">
-                <div class="fgroup">
-                    <label class="flabel" for="f_name">Client Name *</label>
-                    <input class="finput" id="f_name" type="text" placeholder="Your full name" autocomplete="name">
-                </div>
-                <div class="fgroup">
-                    <label class="flabel" for="f_email">Email Address *</label>
-                    <input class="finput" id="f_email" type="email" placeholder="you@example.com" autocomplete="email">
-                </div>
-                <div class="fgroup">
-                    <label class="flabel" for="f_phone">Phone Number *</label>
-                    <input class="finput" id="f_phone" type="tel" placeholder="+91 98765 43210" autocomplete="tel">
-                </div>
-                <div class="fgroup">
-                    <label class="flabel" for="f_inv">Invoice Number *</label>
-                    <input class="finput" id="f_inv" type="text" placeholder="INV-2026-001">
-                </div>
-                <div class="fgroup fw">
-                    <label class="flabel" for="f_svc">Service Type *</label>
-                    <select class="fselect" id="f_svc">
-                        <option value="" disabled selected>Select a service</option>
-                        <option>Website Development</option>
-                        <option>Website Hosting</option>
-                        <option>Domain Registration</option>
-                        <option>Website Maintenance</option>
-                        <option>Custom Service</option>
-                    </select>
-                </div>
-                <div class="fgroup fw">
-                    <label class="flabel" for="f_amt">Amount (₹) *</label>
-                    <div class="amt-wrap">
-                        <span class="amt-pfx">₹</span>
-                        <input class="finput" id="f_amt" type="number" placeholder="0.00" min="1" step="0.01" inputmode="decimal">
-                    </div>
-                </div>
-            </div>
-
-            <div class="btn-row">
-                <button class="btn btn-primary btn-lg" onclick="step1to2()">
-                    Continue to Payment
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ════ STEP 2: PAYMENT ════ -->
-    <div class="sc" id="sc2">
-
-        <!-- Invoice Summary -->
-        <div class="card">
-            <div class="sec-head">
-                <div class="sec-icon">
-                    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                </div>
-                <div>
-                    <div class="sec-title">Invoice Summary</div>
-                    <div class="sec-sub">Review your order before paying</div>
-                </div>
-            </div>
-
-            <div class="inv-card">
-                <div class="inv-head">
-                    <div>
-                        <div class="inv-company">Webistzu</div>
-                        <div class="inv-num" id="d_inv">—</div>
-                    </div>
-                    <button class="btn btn-glass btn-sm" onclick="downloadInvoice()">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        Download
-                    </button>
-                </div>
-                <div class="inv-body">
-                    <div class="inv-row"><span class="inv-k">Client</span><span class="inv-v" id="d_name">—</span></div>
-                    <div class="inv-row"><span class="inv-k">Email</span><span class="inv-v" id="d_email">—</span></div>
-                    <div class="inv-row"><span class="inv-k">Phone</span><span class="inv-v" id="d_phone">—</span></div>
-                    <div class="inv-row"><span class="inv-k">Service</span><span class="inv-v" id="d_svc">—</span></div>
-                    <div class="inv-row"><span class="inv-k">Date</span><span class="inv-v" id="d_date">—</span></div>
-                </div>
-                <div class="inv-total">
-                    <span class="inv-total-lbl">Total Amount</span>
-                    <span class="inv-total-amt" id="d_amt">₹0</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- UPI Payment -->
-        <div class="card">
-            <div class="sec-head">
-                <div class="sec-icon">
-                    <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                </div>
-                <div>
-                    <div class="sec-title">Pay via UPI</div>
-                    <div class="sec-sub">Scan QR code or pay using UPI ID</div>
-                </div>
-            </div>
-
-            <div class="pay-grid">
-                <!-- UPI Details -->
-                <div>
-                    <p style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px;">UPI ID</p>
-                    <div class="upi-box">
-                        <div style="min-width:0;flex:1;">
-                            <div class="upi-id">yourupi@bank</div>
-                            <div class="upi-lbl">Webistzu Payments</div>
-                        </div>
-                        <button class="btn btn-glass btn-sm" onclick="copyUPI()" style="flex-shrink:0;">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                            <span id="copyLbl">Copy</span>
-                        </button>
-                    </div>
-
-                    <div class="upi-link-code" id="upiLinkEl">Generating UPI link…</div>
-
-                    <a href="#" class="pay-btn" id="payNowBtn" onclick="return true;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                        Pay ₹<span id="payAmt">0</span> with Any UPI App
-                    </a>
-
-                    <div class="app-badges">
-                        <div class="app-badge"><div class="dot" style="background:#6b48ff;"></div>PhonePe</div>
-                        <div class="app-badge"><div class="dot" style="background:#00b9f1;"></div>Paytm</div>
-                        <div class="app-badge"><div class="dot" style="background:#f8b400;"></div>GPay</div>
-                        <div class="app-badge"><div class="dot" style="background:#1a73e8;"></div>BHIM</div>
-                        <div class="app-badge"><div class="dot" style="background:#e94540;"></div>Amazon Pay</div>
-                    </div>
-                </div>
-
-                <!-- QR Code -->
-                <div>
-                    <div class="qr-wrap">
-                        <div class="qr-box"><div id="qrcode"></div></div>
-                        <div class="qr-lbl">
-                            <strong>Scan to Pay</strong>
-                            <span>Open any UPI app and scan<br>this QR code to pay instantly</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="divider"><div class="div-line"></div><div class="div-txt">After completing payment</div><div class="div-line"></div></div>
-
-            <div class="info-box">
-                <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                Once paid, tap <strong style="color:var(--tx);">"I've Paid"</strong> to submit your UTR / transaction number and a payment screenshot for verification.
-            </div>
-
-            <div class="btn-row">
-                <button class="btn btn-glass" onclick="goStep(1)">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                    Back
-                </button>
-                <button class="btn btn-primary btn-lg" onclick="goStep(3)">
-                    I've Paid — Continue
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ════ STEP 3: CONFIRMATION ════ -->
-    <div class="sc" id="sc3">
-        <div class="card">
-            <div class="sec-head">
-                <div class="sec-icon">
-                    <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                </div>
-                <div>
-                    <div class="sec-title">Payment Confirmation</div>
-                    <div class="sec-sub">Submit your transaction details</div>
-                </div>
-            </div>
-
-            <div class="fgrid">
-                <div class="fgroup fw">
-                    <label class="flabel" for="f_utr">Transaction / UTR Number *</label>
-                    <input class="finput" id="f_utr" type="text" placeholder="e.g. 123456789012" inputmode="numeric">
-                    <div class="field-hint">Find this in your UPI app → Transaction History → Reference / UTR Number</div>
-                </div>
-            </div>
-
-            <div style="margin-top:20px;">
-                <label class="flabel" style="display:block;margin-bottom:10px;">Payment Screenshot *</label>
-                <div class="upload-zone" id="uploadZone">
-                    <input type="file" id="f_ss" accept="image/*" onchange="handleUpload(event)">
-                    <div class="upload-icon">
-                        <svg width="clamp(32px,8vw,44px)" height="clamp(32px,8vw,44px)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:clamp(32px,8vw,44px);height:clamp(32px,8vw,44px);">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="17 8 12 3 7 8"/>
-                            <line x1="12" y1="3" x2="12" y2="15"/>
-                        </svg>
-                    </div>
-                    <div class="upload-title">Tap to upload or drag &amp; drop</div>
-                    <div class="upload-hint">PNG, JPG, WEBP — max 10 MB</div>
-                    <div class="upload-preview" id="previewWrap">
-                        <img id="previewImg" src="" alt="Payment Screenshot">
-                        <div class="upload-fname">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span id="previewFname"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div style="margin-top:20px;">
-                <div class="info-box">
-                    <svg width="16" height="16" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    Your screenshot will be saved securely and our team will verify your payment. For urgent help, email <strong style="color:var(--tx);">support@webistzu.com</strong>
-                </div>
-            </div>
-
-            <div class="btn-row">
-                <button class="btn btn-glass" onclick="goStep(2)">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                    Back
-                </button>
-                <button class="btn btn-ok btn-lg" onclick="submitPayment()">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                    Submit Payment
-                </button>
-            </div>
-        </div>
-    </div>
-
-</div><!-- /wrap -->
-
-<!-- ════════════════════════════════════════════
-     FOOTER
-════════════════════════════════════════════ -->
-<footer>
-    <div class="ft-logo">Webistzu</div>
-    <div class="ft-tag">Webpages. Web Presence. Webistzu.</div>
-    <div class="ft-badges">
-        <div class="sec-badge"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Secure Payment</div>
-        <div class="sec-badge"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>SSL Encrypted</div>
-        <div class="sec-badge"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>UPI Verified</div>
-    </div>
-    <div class="ft-links">
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Service</a>
-        <a href="#">Refund Policy</a>
-        <a href="#">Contact Us</a>
-    </div>
-    <div class="ft-copy">© 2026 Webistzu. All rights reserved.</div>
-</footer>
-
-<!-- ════════════════════════════════════════════
-     SCRIPTS
-════════════════════════════════════════════ -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
-'use strict';
-/* =======================================================
-   WEBISTZU PAYMENT PORTAL v2.0
-   Screenshots → ./img/trans/ via upload.php
-   ======================================================= */
+/* ═══════════ APP STATE & DATA ═══════════ */
+const APP = {
+  user: null,
+  currentView: '',
+  yearly: false,
 
-const UPI_ID   = 'yourupi@bank';
-const UPI_NAME = 'Webistzu';
-let fd           = {};
+  users: [
+    {id:1,role:'client',name:'Arjun Sharma',  email:'client@webistzu.com',pass:'client123',phone:'+91 98765 43210',company:'TechVentures Pvt Ltd',joined:'Jan 2026'},
+    {id:2,role:'admin', name:'Admin User',     email:'admin@webistzu.com', pass:'admin123', phone:'+91 80000 00000',company:'Webistzu',              joined:'Jan 2025'},
+  ],
+
+  clients:[
+    {id:1,name:'Arjun Sharma',  email:'client@webistzu.com',phone:'+91 98765 43210',company:'TechVentures',  joined:'Jan 2026',spent:'₹85,000', projects:3},
+    {id:2,name:'Priya Mehta',   email:'priya@example.com',  phone:'+91 77777 11111',company:'StartupCo',      joined:'Feb 2026',spent:'₹45,000', projects:2},
+    {id:3,name:'Rahul Singh',   email:'rahul@example.com',  phone:'+91 99111 22333',company:'MediaHub',       joined:'Mar 2026',spent:'₹1,20,000',projects:4},
+  ],
+
+  invoices:[
+    {id:'WBZ-2026-0001',client:'Arjun Sharma',service:'E-Commerce Website',amount:35000,due:'2026-06-20',status:'Paid',    date:'2026-05-15',items:[{desc:'E-Commerce Website Design & Dev',qty:1,rate:30000},{desc:'Payment Gateway Integration',qty:1,rate:5000}]},
+    {id:'WBZ-2026-0002',client:'Arjun Sharma',service:'SEO Package',        amount:12000,due:'2026-07-01',status:'Pending', date:'2026-06-01',items:[{desc:'SEO Audit & Setup',qty:1,rate:8000},{desc:'Monthly SEO Maintenance',qty:1,rate:4000}]},
+    {id:'WBZ-2026-0003',client:'Priya Mehta', service:'Logo Design',        amount:8500, due:'2026-06-15',status:'Overdue', date:'2026-05-10',items:[{desc:'Logo Design (3 concepts)',qty:1,rate:6000},{desc:'Brand Guidelines',qty:1,rate:2500}]},
+    {id:'WBZ-2026-0004',client:'Rahul Singh', service:'Mobile App',         amount:75000,due:'2026-08-01',status:'Pending', date:'2026-06-05',items:[{desc:'Android App Development',qty:1,rate:55000},{desc:'iOS App Development',qty:1,rate:20000}]},
+    {id:'WBZ-2026-0005',client:'Arjun Sharma',service:'Web Hosting',        amount:3600, due:'2026-12-31',status:'Paid',    date:'2026-01-01',items:[{desc:'Annual Web Hosting',qty:1,rate:3000},{desc:'SSL Certificate',qty:1,rate:600}]},
+  ],
+
+  payments:[
+    {id:'PAY-001',invoice:'WBZ-2026-0001',client:'Arjun Sharma',amount:35000,method:'UPI',utr:'UTR123456789',date:'2026-05-18',status:'Approved',    screenshot:'receipt1.jpg'},
+    {id:'PAY-002',invoice:'WBZ-2026-0005',client:'Arjun Sharma',amount:3600, method:'UPI',utr:'UTR987654321',date:'2026-01-02',status:'Approved',    screenshot:'receipt2.jpg'},
+    {id:'PAY-003',invoice:'WBZ-2026-0004',client:'Rahul Singh', amount:40000,method:'UPI',utr:'UTR111222333',date:'2026-06-08',status:'Under Review', screenshot:'receipt3.jpg'},
+    {id:'PAY-004',invoice:'WBZ-2026-0002',client:'Arjun Sharma',amount:12000,method:'UPI',utr:'UTR444555666',date:'2026-06-10',status:'Pending',      screenshot:''},
+  ],
+
+  projects:[
+    {name:'E-Commerce Website', status:'Completed',   progress:100,due:'May 2026',budget:'₹35,000'},
+    {name:'Mobile App MVP',      status:'In Progress', progress:65, due:'Aug 2026',budget:'₹75,000'},
+    {name:'SEO Optimisation',    status:'In Progress', progress:30, due:'Jul 2026',budget:'₹12,000'},
+  ],
+
+  notifications:[
+    {id:1,icon:'💳',title:'Payment Approved',  desc:'Your payment for WBZ-2026-0001 has been approved.',   time:'2 hours ago',unread:true},
+    {id:2,icon:'🧾',title:'New Invoice',        desc:'Invoice WBZ-2026-0002 for SEO Package is due Jul 1.', time:'1 day ago',  unread:true},
+    {id:3,icon:'🚀',title:'Project Update',     desc:'Mobile App MVP is now 65% complete.',                 time:'2 days ago', unread:true},
+    {id:4,icon:'🎉',title:'Welcome!',           desc:'Welcome to Webistzu Client Portal.',                  time:'5 days ago', unread:true},
+  ],
+
+  services:[
+    {icon:'🌐',name:'Website Development',   desc:'Custom websites from landing pages to full web applications.',price:'Starting ₹15,000'},
+    {icon:'📱',name:'Mobile App Development',desc:'Native & cross-platform apps for iOS and Android.',            price:'Starting ₹50,000'},
+    {icon:'🛒',name:'E-Commerce Solutions',  desc:'Complete online stores with secure payment gateways.',         price:'Starting ₹25,000'},
+    {icon:'🎨',name:'UI/UX Design',          desc:'Beautiful, user-centred interfaces and brand identities.',      price:'Starting ₹8,000'},
+    {icon:'📈',name:'SEO & Marketing',       desc:'Drive organic traffic with proven SEO strategies.',             price:'Starting ₹5,000/mo'},
+    {icon:'☁️',name:'Hosting & Maintenance', desc:'Managed cloud hosting, backups and 24/7 monitoring.',           price:'Starting ₹3,000/yr'},
+  ],
+
+  quoteServices:[
+    {id:'web', name:'Website Design & Development',monthly:15000,yearly:150000},
+    {id:'app', name:'Mobile App (Android + iOS)',   monthly:50000,yearly:500000},
+    {id:'ecom',name:'E-Commerce Store',             monthly:25000,yearly:250000},
+    {id:'uiux',name:'UI/UX Design',                 monthly:8000, yearly:80000},
+    {id:'seo', name:'SEO & Digital Marketing',      monthly:5000, yearly:50000},
+    {id:'host',name:'Hosting & Maintenance',        monthly:3000, yearly:30000},
+    {id:'logo',name:'Logo & Branding',              monthly:6000, yearly:60000},
+    {id:'cms', name:'CMS Setup & Training',         monthly:10000,yearly:100000},
+  ],
+
+  UPI_ID: 'webistzu@upi',
+  UPI_NAME: 'Webistzu Technologies',
+};
+
+/* ═══════════ AUTH ═══════════ */
+let loginTab = 'client';
+
+function switchLoginTab(t) {
+  loginTab = t;
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(t==='client'&&i===0)||(t==='admin'&&i===1)));
+  document.getElementById('login-email').value = t==='admin' ? 'admin@webistzu.com' : 'client@webistzu.com';
+  document.getElementById('login-pass').value  = t==='admin' ? 'admin123'           : 'client123';
+  document.getElementById('demo-hint').textContent = t==='admin'
+    ? 'Admin: admin@webistzu.com / admin123'
+    : 'Client: client@webistzu.com / client123';
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value.trim();
+  const err   = document.getElementById('login-err');
+  const u = APP.users.find(x=>x.email===email && x.pass===pass && x.role===loginTab);
+  if (!u) { err.textContent='Invalid credentials.'; err.style.display='block'; return; }
+  err.style.display='none';
+  APP.user = u;
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').classList.add('visible');
+  document.getElementById('role-badge').textContent = u.role==='admin' ? 'Admin' : 'Client';
+  document.getElementById('user-name').textContent  = u.name;
+  document.getElementById('user-email').textContent = u.email;
+  document.getElementById('user-avatar').textContent= u.name[0];
+  document.getElementById('client-nav').style.display = u.role==='client' ? 'block' : 'none';
+  document.getElementById('admin-nav').style.display  = u.role==='admin'  ? 'block' : 'none';
+  navigate(u.role==='admin' ? 'admin-dashboard' : 'dashboard');
+}
+
+function doLogout() {
+  APP.user = null;
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('login-screen').style.display='flex';
+}
+
+/* ═══════════ ROUTER ═══════════ */
+const titles = {
+  dashboard:'Dashboard',invoices:'Invoices',payment:'Make Payment',
+  status:'Payment Status',services:'Our Services',pricing:'Pricing Plans',
+  quote:'Get a Quote',support:'Support',notifications:'Notifications',profile:'My Profile',
+  'admin-dashboard':'Analytics','admin-clients':'Clients','admin-invoices':'All Invoices',
+  'admin-payments':'Payments','admin-quotes':'Quotations',
+};
+
+function navigate(view) {
+  APP.currentView = view;
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  const nav = document.getElementById('nav-'+view);
+  if (nav) nav.classList.add('active');
+  document.getElementById('page-title').textContent = titles[view]||view;
+  const c = document.getElementById('content');
+  c.innerHTML = '';
+  const renders = {
+    dashboard:renderDashboard,invoices:renderInvoices,payment:renderPayment,
+    status:renderStatus,services:renderServices,pricing:renderPricing,
+    quote:renderQuote,support:renderSupport,notifications:renderNotifications,
+    profile:renderProfile,
+    'admin-dashboard':renderAdminDashboard,'admin-clients':renderAdminClients,
+    'admin-invoices':renderAdminInvoices,'admin-payments':renderAdminPayments,
+    'admin-quotes':renderAdminQuotes,
+  };
+  if (renders[view]) c.innerHTML = renders[view]();
+  if (view==='payment') initPayment();
+  if (view==='admin-dashboard') initCharts();
+  closeSidebar();
+  c.scrollTop = 0;
+}
+
+/* ═══════════ SIDEBAR ═══════════ */
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
+/* ═══════════ CLIENT VIEWS ═══════════ */
+function renderDashboard() {
+  const myInv = APP.invoices.filter(i=>i.client===APP.user.name);
+  const paid  = myInv.filter(i=>i.status==='Paid').reduce((s,i)=>s+i.amount,0);
+  const pend  = myInv.filter(i=>i.status==='Pending'||i.status==='Overdue').length;
+  return `
+<div class="stats-grid">
+  <div class="stat-card purple"><div class="stat-icon">💼</div><div class="stat-label">Active Projects</div><div class="stat-value">${APP.projects.filter(p=>p.status!=='Completed').length}</div><div class="stat-change">↑ On Track</div></div>
+  <div class="stat-card blue"><div class="stat-icon">🧾</div><div class="stat-label">Total Invoices</div><div class="stat-value">${myInv.length}</div><div class="stat-change">${pend} pending</div></div>
+  <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-label">Total Paid</div><div class="stat-value">₹${paid.toLocaleString('en-IN')}</div><div class="stat-change">↑ All cleared</div></div>
+  <div class="stat-card orange"><div class="stat-icon">⭐</div><div class="stat-label">Member Since</div><div class="stat-value" style="font-size:18px;">${APP.user.joined}</div><div class="stat-change">Valued Client</div></div>
+</div>
+
+<div class="grid-2 mb-24">
+  <div class="card">
+    <div class="card-title">Active Projects</div>
+    ${APP.projects.map(p=>`
+    <div style="margin-bottom:18px;">
+      <div class="flex justify-between items-center mb-8">
+        <span style="font-size:13px;font-weight:600;">${p.name}</span>
+        <span class="badge ${p.status==='Completed'?'green':p.status==='In Progress'?'blue':'yellow'}">${p.status}</span>
+      </div>
+      <div style="background:var(--border);border-radius:4px;height:6px;overflow:hidden;">
+        <div style="height:100%;width:${p.progress}%;background:linear-gradient(90deg,var(--p1),var(--p3));border-radius:4px;"></div>
+      </div>
+      <div class="flex justify-between mt-8 text-xs text-muted"><span>${p.progress}% complete</span><span>Due: ${p.due}</span></div>
+    </div>`).join('')}
+  </div>
+  <div class="card">
+    <div class="card-title">Recent Invoices</div>
+    ${myInv.slice(0,3).map(inv=>`
+    <div class="flex justify-between items-center" style="padding:10px 0;border-bottom:1px solid var(--border);">
+      <div><div style="font-size:13px;font-weight:600;">${inv.id}</div><div class="text-xs text-muted">${inv.service}</div></div>
+      <div style="text-align:right;"><div style="font-size:13px;font-weight:700;">₹${inv.amount.toLocaleString('en-IN')}</div><span class="badge ${inv.status==='Paid'?'green':inv.status==='Overdue'?'red':'yellow'}">${inv.status}</span></div>
+    </div>`).join('')}
+    <button class="btn btn-ghost w-full mt-16 btn-sm" onclick="navigate('invoices')">View All Invoices →</button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">Quick Actions</div>
+  <div style="display:flex;flex-wrap:wrap;gap:12px;">
+    <button class="btn btn-grad" onclick="navigate('payment')">💳 Make Payment</button>
+    <button class="btn btn-ghost" onclick="navigate('invoices')">🧾 View Invoices</button>
+    <button class="btn btn-ghost" onclick="navigate('quote')">📋 Get Quote</button>
+    <button class="btn btn-ghost" onclick="navigate('support')">💬 Get Support</button>
+    <button class="btn btn-ghost" onclick="navigate('status')">📊 Payment Status</button>
+  </div>
+</div>`;
+}
+
+function renderInvoices() {
+  const myInv = APP.invoices.filter(i=>i.client===APP.user.name);
+  return `
+<div class="card mb-24">
+  <div class="flex justify-between items-center mb-16">
+    <div class="card-title" style="margin:0;">Your Invoices</div>
+    <span class="text-xs text-muted">${myInv.length} total</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Invoice #</th><th>Service</th><th>Amount</th><th>Due Date</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        ${myInv.map(inv=>`<tr>
+          <td><span style="font-weight:700;color:var(--p3);">${inv.id}</span></td>
+          <td>${inv.service}</td>
+          <td style="font-weight:700;">₹${inv.amount.toLocaleString('en-IN')}</td>
+          <td class="text-muted">${inv.due}</td>
+          <td><span class="badge ${inv.status==='Paid'?'green':inv.status==='Overdue'?'red':'yellow'}">${inv.status}</span></td>
+          <td>
+            <button class="btn btn-ghost btn-sm" onclick="viewInvoice('${inv.id}')">View</button>
+            <button class="btn btn-ghost btn-sm" onclick="downloadInvoice('${inv.id}')">⬇ PDF</button>
+            ${inv.status!=='Paid'?`<button class="btn btn-grad btn-sm" onclick="navigate('payment')">Pay</button>`:''}
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+</div>`;
+}
+
+function renderPayment() {
+  const unpaid = APP.invoices.filter(i=>i.client===APP.user.name && i.status!=='Paid');
+  const opts   = unpaid.map(i=>`<option value="${i.id}" data-amount="${i.amount}">${i.id} — ${i.service} (₹${i.amount.toLocaleString('en-IN')})</option>`).join('');
+  return `
+<div style="max-width:760px;margin:0 auto;">
+  <div class="card mb-16">
+    <div class="card-title">Payment Details</div>
+    <div class="form-row cols-2">
+      <div class="field"><label>Select Invoice</label>
+        <select id="pay-invoice" onchange="updatePayAmount()"><option value="">-- Choose Invoice --</option>${opts}</select>
+      </div>
+      <div class="field"><label>Amount (INR)</label><input type="number" id="pay-amount" placeholder="Enter amount" min="1" oninput="updateAmountDisplay(this.value)"></div>
+    </div>
+  </div>
+
+  <div class="pay-grid">
+    <div class="upi-box">
+      <div style="font-size:15px;font-weight:700;margin-bottom:8px;">Pay via UPI</div>
+      <div class="text-xs text-muted mb-8">Send payment to the UPI ID below:</div>
+      <div class="upi-id-display">
+        <span>${APP.UPI_ID}</span>
+        <button class="btn btn-ghost btn-sm" onclick="copyUPI()">📋 Copy</button>
+      </div>
+      <div class="amount-display" id="pay-amount-display">₹0</div>
+      <div class="text-xs text-muted">Amount will auto-fill in your UPI app when scanning QR</div>
+      <a id="open-upi-btn" class="btn btn-grad w-full mt-16" style="display:none;justify-content:center;">Open UPI App →</a>
+    </div>
+    <div class="qr-box">
+      <div style="font-size:15px;font-weight:700;margin-bottom:4px;">Scan QR Code</div>
+      <div class="text-xs text-muted mb-8">Use any UPI app to scan</div>
+      <div id="qr-container"></div>
+      <div class="text-xs text-muted">${APP.UPI_NAME}</div>
+    </div>
+  </div>
+
+  <div class="card mt-16">
+    <div class="card-title">Confirm Payment</div>
+    <div class="form-row cols-2">
+      <div class="field"><label>UTR / Transaction ID *</label><input type="text" id="pay-utr" placeholder="12-digit UTR number"></div>
+      <div class="field"><label>Payment Date</label><input type="date" id="pay-date" value="${new Date().toISOString().slice(0,10)}"></div>
+    </div>
+    <div class="field mb-16">
+      <label>Payment Screenshot *</label>
+      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('pay-file').click()"
+           ondragover="event.preventDefault();this.classList.add('drag')"
+           ondragleave="this.classList.remove('drag')"
+           ondrop="handleDrop(event)">
+        <div class="icon">📸</div>
+        <p>Click or drag your payment screenshot here</p>
+        <p style="font-size:11px;margin-top:4px;">JPG, PNG, WEBP, GIF — Max 10 MB</p>
+        <img id="file-preview" src="" alt="">
+      </div>
+      <input type="file" id="pay-file" accept="image/*" style="display:none;" onchange="handleFile(this.files[0])">
+      <div id="file-name" class="text-xs text-muted mt-8"></div>
+    </div>
+    <div id="pay-error" style="color:var(--red);font-size:12px;margin-bottom:12px;display:none;"></div>
+    <button class="btn btn-grad w-full" style="padding:14px;" onclick="submitPayment()">✅ Submit Payment Proof</button>
+  </div>
+</div>`;
+}
+
+function renderStatus() {
+  const myPay = APP.payments.filter(p=>p.client===APP.user.name);
+  const steps = ['Pending','Under Review','Approved','Completed'];
+  return `
+<div style="max-width:760px;margin:0 auto;">
+  ${myPay.length===0
+    ? `<div class="card text-center"><p class="text-muted">No payments submitted yet.</p><button class="btn btn-grad mt-16" onclick="navigate('payment')">Make a Payment</button></div>`
+    : myPay.map(pay=>{
+        const si = Math.max(0,Math.min(steps.indexOf(pay.status),3));
+        return `<div class="card mb-16">
+          <div class="flex justify-between items-center mb-16">
+            <div><div style="font-weight:700;">${pay.invoice}</div><div class="text-xs text-muted">ID: ${pay.id} · UTR: ${pay.utr||'—'}</div></div>
+            <div style="text-align:right;"><div style="font-size:18px;font-weight:800;">₹${pay.amount.toLocaleString('en-IN')}</div>
+              <span class="badge ${pay.status==='Approved'||pay.status==='Completed'?'green':pay.status==='Under Review'?'blue':pay.status==='Rejected'?'red':'yellow'}">${pay.status}</span>
+            </div>
+          </div>
+          <div class="tracker">
+            ${steps.map((s,i)=>`<div class="tracker-step ${i<si?'done':i===si?'active':''}">
+              <div class="tracker-dot">${i<si?'✓':i+1}</div><p>${s}</p>
+            </div>`).join('')}
+          </div>
+          <div class="text-xs text-muted mt-16">Submitted: ${pay.date}</div>
+        </div>`;
+      }).join('')}
+</div>`;
+}
+
+function renderServices() {
+  return `
+<p class="text-muted text-sm mb-24" style="max-width:600px;">End-to-end digital solutions tailored for your business. Click any service to request a quote.</p>
+<div class="services-grid">
+  ${APP.services.map(s=>`
+  <div class="service-card" onclick="quoteService('${s.name}')">
+    <div class="service-icon">${s.icon}</div>
+    <div class="service-name">${s.name}</div>
+    <div class="service-desc">${s.desc}</div>
+    <div class="service-price">${s.price}</div>
+  </div>`).join('')}
+</div>`;
+}
+
+function renderPricing() {
+  const y = APP.yearly;
+  const plans = [
+    {name:'Starter',   color:'var(--p3)', monthly:15000,yearly:144000,desc:'For small businesses',
+     feats:['5-page Website','Mobile Responsive','Basic SEO','1 Year Hosting','Email Support']},
+    {name:'Professional',color:'var(--p1)',monthly:35000,yearly:336000,desc:'For growing businesses',featured:true,
+     feats:['Unlimited Pages','E-Commerce Ready','Advanced SEO','Free Domain & Hosting','Priority Support','Monthly Reports']},
+    {name:'Enterprise',color:'var(--orange)',monthly:80000,yearly:768000,desc:'Full-scale digital presence',
+     feats:['Everything in Pro','Mobile App','CRM Integration','Dedicated Manager','24/7 Support','Custom Integrations']},
+  ];
+  return `
+<div class="text-center mb-24">
+  <h2 style="font-size:24px;font-weight:800;margin-bottom:8px;">Choose Your Plan</h2>
+  <p class="text-muted text-sm">All plans include a free consultation and project scoping.</p>
+  <div class="toggle-row mt-16">
+    <span class="text-sm">Monthly</span>
+    <div class="toggle ${y?'on':''}" onclick="toggleYearly()"><div class="toggle-thumb"></div></div>
+    <span class="text-sm">Yearly <span style="color:var(--green);font-size:11px;">(Save 20%)</span></span>
+  </div>
+</div>
+<div class="pricing-grid">
+  ${plans.map(p=>`
+  <div class="price-card ${p.featured?'featured':''}">
+    <div class="price-name" style="color:${p.color};">${p.name}</div>
+    <div class="price-desc">${p.desc}</div>
+    <div class="price-amount">₹${(y?p.yearly:p.monthly).toLocaleString('en-IN')}<span>/${y?'yr':'mo'}</span></div>
+    <ul class="price-features">${p.feats.map(f=>`<li>${f}</li>`).join('')}</ul>
+    <button class="btn ${p.featured?'btn-grad':'btn-ghost'} w-full" onclick="navigate('quote')">Get Started</button>
+  </div>`).join('')}
+</div>`;
+}
+
+function renderQuote() {
+  return `
+<div style="max-width:700px;margin:0 auto;">
+  <div class="card mb-16">
+    <div class="card-title">Select Services</div>
+    <p class="text-muted text-sm mb-16">Choose the services you need and we'll prepare a custom quote.</p>
+    ${APP.quoteServices.map(s=>`
+    <div class="quote-item">
+      <input type="checkbox" id="qs-${s.id}" onchange="calcQuote()">
+      <div class="quote-item-info">
+        <div class="quote-item-name">${s.name}</div>
+        <div class="quote-item-price">₹${s.monthly.toLocaleString('en-IN')} / project</div>
+      </div>
+    </div>`).join('')}
+  </div>
+
+  <div class="card mb-16">
+    <div class="card-title">Your Details</div>
+    <div class="form-row cols-2">
+      <div class="field"><label>Full Name *</label><input type="text" id="q-name" value="${APP.user.name}"></div>
+      <div class="field"><label>Email *</label><input type="email" id="q-email" value="${APP.user.email}"></div>
+    </div>
+    <div class="form-row cols-2">
+      <div class="field"><label>Phone</label><input type="text" id="q-phone" value="${APP.user.phone||''}"></div>
+      <div class="field"><label>Company</label><input type="text" id="q-company" value="${APP.user.company||''}"></div>
+    </div>
+    <div class="field"><label>Project Details</label><textarea id="q-notes" placeholder="Describe your requirements, timeline, and any specific needs..."></textarea></div>
+  </div>
+
+  <div class="quote-total" id="quote-total" style="display:none;">
+    <div class="flex justify-between items-center mb-8">
+      <span style="font-weight:700;">Estimated Total</span>
+      <span style="font-size:28px;font-weight:800;color:var(--p1);" id="quote-price">₹0</span>
+    </div>
+    <div class="text-xs text-muted">Estimate only — final pricing confirmed after consultation.</div>
+  </div>
+
+  <div style="display:flex;gap:12px;margin-top:16px;">
+    <button class="btn btn-grad" style="flex:1;padding:14px;" onclick="submitQuote()">📋 Request Quote</button>
+    <button class="btn btn-ghost" onclick="printQuote()">🖨 Print</button>
+  </div>
+</div>`;
+}
+
+function renderSupport() {
+  const faqs = [
+    {q:'How long does a website project take?',a:'Typical timelines: Landing page 3–5 days, Business site 1–2 weeks, E-commerce 3–4 weeks, Mobile app 6–12 weeks. A detailed schedule is provided before we start.'},
+    {q:'What payment methods do you accept?',a:'All major UPI apps (GPay, PhonePe, Paytm, BHIM), bank transfers (NEFT/IMPS/RTGS), and credit/debit cards. Payments are confirmed after UTR verification.'},
+    {q:'Do you provide post-launch support?',a:'Yes! All projects include 30 days of free post-launch support. Beyond that, maintenance packages start at ₹3,000/year.'},
+    {q:'Can I request changes after delivery?',a:'Minor revisions are included in every project. Major scope changes are quoted separately. We follow a transparent change-request process.'},
+    {q:'Is my data secure?',a:'All data is encrypted, stored on secure servers, and never shared with third parties. We follow GDPR-aligned practices.'},
+  ];
+  return `
+<div class="grid-2 mb-24">
+  <div class="card">
+    <div class="card-title">Contact Us</div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <a href="mailto:support@webistzu.com" style="display:flex;align-items:center;gap:12px;color:var(--text);text-decoration:none;padding:12px;background:var(--glass);border-radius:var(--r2);">
+        <span style="font-size:22px;">📧</span><div><div style="font-weight:600;font-size:13px;">Email Support</div><div class="text-xs text-muted">support@webistzu.com</div></div>
+      </a>
+      <a href="https://wa.me/919999999999" target="_blank" style="display:flex;align-items:center;gap:12px;color:var(--text);text-decoration:none;padding:12px;background:var(--glass);border-radius:var(--r2);">
+        <span style="font-size:22px;">💬</span><div><div style="font-weight:600;font-size:13px;">WhatsApp</div><div class="text-xs text-muted">+91 99999 99999</div></div>
+      </a>
+      <a href="tel:+919999999999" style="display:flex;align-items:center;gap:12px;color:var(--text);text-decoration:none;padding:12px;background:var(--glass);border-radius:var(--r2);">
+        <span style="font-size:22px;">📞</span><div><div style="font-weight:600;font-size:13px;">Call Us</div><div class="text-xs text-muted">Mon–Sat 10am – 7pm</div></div>
+      </a>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Send a Message</div>
+    <div class="field mb-16"><label>Subject</label><input type="text" id="sup-subject" placeholder="How can we help?"></div>
+    <div class="field mb-16"><label>Message</label><textarea id="sup-msg" placeholder="Describe your issue..." style="min-height:100px;"></textarea></div>
+    <button class="btn btn-grad w-full" onclick="sendSupport()">Send Message</button>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title">Frequently Asked Questions</div>
+  ${faqs.map((f,i)=>`
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(${i})">${f.q} <span id="faq-arrow-${i}">▼</span></div>
+    <div class="faq-a" id="faq-a-${i}">${f.a}</div>
+  </div>`).join('')}
+</div>`;
+}
+
+function renderNotifications() {
+  return `
+<div style="max-width:640px;margin:0 auto;">
+  <div class="flex justify-between items-center mb-16">
+    <span class="text-muted text-sm">${APP.notifications.filter(n=>n.unread).length} unread</span>
+    <button class="btn btn-ghost btn-sm" onclick="markAllRead()">Mark all read</button>
+  </div>
+  <div class="notif-list">
+    ${APP.notifications.map(n=>`
+    <div class="notif-item ${n.unread?'unread':''}" id="notif-${n.id}">
+      <div class="notif-icon">${n.icon}</div>
+      <div class="notif-content" style="flex:1;">
+        <div class="title">${n.title}</div>
+        <div class="desc">${n.desc}</div>
+        <div class="time">${n.time}</div>
+      </div>
+      ${n.unread?`<button class="btn btn-ghost btn-sm" onclick="readNotif(${n.id})">✓</button>`:''}
+    </div>`).join('')}
+  </div>
+</div>`;
+}
+
+function renderProfile() {
+  const u = APP.user;
+  return `
+<div style="max-width:640px;margin:0 auto;">
+  <div class="card mb-16">
+    <div style="display:flex;align-items:center;gap:20px;margin-bottom:20px;">
+      <div class="avatar" style="width:64px;height:64px;font-size:24px;">${u.name[0]}</div>
+      <div><div style="font-size:20px;font-weight:800;">${u.name}</div><div class="text-muted text-sm">${u.email}</div><span class="badge purple" style="margin-top:8px;display:inline-flex;">${u.role==='admin'?'Administrator':'Client'}</span></div>
+    </div>
+    <div class="form-row cols-2">
+      <div class="field"><label>Full Name</label><input type="text" id="p-name" value="${u.name}"></div>
+      <div class="field"><label>Email</label><input type="email" id="p-email" value="${u.email}"></div>
+    </div>
+    <div class="form-row cols-2">
+      <div class="field"><label>Phone</label><input type="text" id="p-phone" value="${u.phone||''}"></div>
+      <div class="field"><label>Company</label><input type="text" id="p-company" value="${u.company||''}"></div>
+    </div>
+    <button class="btn btn-grad" onclick="saveProfile()">Save Changes</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Change Password</div>
+    <div class="form-row cols-2">
+      <div class="field"><label>Current Password</label><input type="password" id="p-old"></div>
+      <div class="field"><label>New Password</label><input type="password" id="p-new"></div>
+    </div>
+    <button class="btn btn-ghost" onclick="changePass()">Update Password</button>
+  </div>
+</div>`;
+}
+
+/* ═══════════ ADMIN VIEWS ═══════════ */
+function renderAdminDashboard() {
+  const rev = APP.payments.filter(p=>p.status==='Approved'||p.status==='Completed').reduce((s,p)=>s+p.amount,0);
+  return `
+<div class="stats-grid">
+  <div class="stat-card purple"><div class="stat-icon">👥</div><div class="stat-label">Total Clients</div><div class="stat-value">${APP.clients.length}</div><div class="stat-change">↑ +2 this month</div></div>
+  <div class="stat-card blue"><div class="stat-icon">🧾</div><div class="stat-label">Total Invoices</div><div class="stat-value">${APP.invoices.length}</div><div class="stat-change">${APP.invoices.filter(i=>i.status==='Pending').length} pending</div></div>
+  <div class="stat-card green"><div class="stat-icon">💰</div><div class="stat-label">Revenue (2026)</div><div class="stat-value">₹${(rev/1000).toFixed(0)}K</div><div class="stat-change">↑ 18% growth</div></div>
+  <div class="stat-card orange"><div class="stat-icon">⏳</div><div class="stat-label">Pending Review</div><div class="stat-value">${APP.payments.filter(p=>p.status==='Pending'||p.status==='Under Review').length}</div><div class="stat-change">Action needed</div></div>
+</div>
+<div class="chart-grid">
+  <div class="card"><div class="card-title">Monthly Revenue (₹)</div><div class="chart-wrap"><canvas id="revenue-chart"></canvas></div></div>
+  <div class="card"><div class="card-title">Payment Status</div><div class="chart-wrap"><canvas id="status-chart"></canvas></div></div>
+</div>`;
+}
+
+function renderAdminClients() {
+  return `
+<div class="card">
+  <div class="flex justify-between items-center mb-16">
+    <div class="card-title" style="margin:0;">All Clients</div>
+    <button class="btn btn-grad btn-sm" onclick="showToast('Add client form coming soon!')">+ Add Client</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Phone</th><th>Projects</th><th>Total Spent</th><th>Joined</th></tr></thead>
+      <tbody>${APP.clients.map(c=>`
+        <tr>
+          <td><div class="flex items-center gap-8"><div class="avatar" style="width:28px;height:28px;font-size:11px;">${c.name[0]}</div>${c.name}</div></td>
+          <td>${c.company}</td><td class="text-muted">${c.email}</td><td class="text-muted">${c.phone}</td>
+          <td>${c.projects}</td><td style="font-weight:700;">${c.spent}</td><td class="text-muted">${c.joined}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+</div>`;
+}
+
+function renderAdminInvoices() {
+  return `
+<div class="card">
+  <div class="flex justify-between items-center mb-16">
+    <div class="card-title" style="margin:0;">All Invoices</div>
+    <button class="btn btn-grad btn-sm" onclick="showToast('New invoice form coming soon!')">+ New Invoice</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Invoice #</th><th>Client</th><th>Service</th><th>Amount</th><th>Due</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>${APP.invoices.map(inv=>`
+        <tr>
+          <td style="font-weight:700;color:var(--p3);">${inv.id}</td>
+          <td>${inv.client}</td><td>${inv.service}</td>
+          <td style="font-weight:700;">₹${inv.amount.toLocaleString('en-IN')}</td>
+          <td class="text-muted">${inv.due}</td>
+          <td><span class="badge ${inv.status==='Paid'?'green':inv.status==='Overdue'?'red':'yellow'}">${inv.status}</span></td>
+          <td>
+            <button class="btn btn-ghost btn-sm" onclick="viewInvoice('${inv.id}')">View</button>
+            <button class="btn btn-ghost btn-sm" onclick="downloadInvoice('${inv.id}')">⬇ PDF</button>
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+</div>`;
+}
+
+function renderAdminPayments() {
+  return `
+<div class="card">
+  <div class="card-title">Payment Management</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Pay ID</th><th>Client</th><th>Invoice</th><th>Amount</th><th>UTR</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>${APP.payments.map(p=>`
+        <tr>
+          <td style="font-weight:700;">${p.id}</td>
+          <td>${p.client}</td>
+          <td style="color:var(--p3);">${p.invoice}</td>
+          <td style="font-weight:700;">₹${p.amount.toLocaleString('en-IN')}</td>
+          <td class="text-muted" style="font-family:monospace;font-size:12px;">${p.utr||'—'}</td>
+          <td class="text-muted">${p.date}</td>
+          <td><span class="badge ${p.status==='Approved'||p.status==='Completed'?'green':p.status==='Under Review'?'blue':p.status==='Rejected'?'red':'yellow'}">${p.status}</span></td>
+          <td>${p.status!=='Approved'&&p.status!=='Completed'&&p.status!=='Rejected'
+            ? `<button class="btn btn-green btn-sm" onclick="approvePayment('${p.id}')">✓ Approve</button>
+               <button class="btn btn-red btn-sm" onclick="rejectPayment('${p.id}')">✕ Reject</button>`
+            : '<span class="text-xs text-muted">Done</span>'}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+</div>`;
+}
+
+function renderAdminQuotes() {
+  return `
+<div class="card text-center" style="padding:60px 20px;">
+  <div style="font-size:48px;margin-bottom:16px;">📋</div>
+  <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Quotation Requests</div>
+  <p class="text-muted text-sm">Quote requests from clients will appear here.<br>Clients submit requests from the "Get Quote" section.</p>
+</div>`;
+}
+
+/* ═══════════ PAYMENT LOGIC ═══════════ */
 let uploadedFile = null;
 
-/* ── Floating particles ── */
-(function(){
-    const c = document.getElementById('particles');
-    const col = ['rgba(124,58,237,.32)','rgba(37,99,235,.28)','rgba(139,92,246,.22)','rgba(96,165,250,.18)'];
-    for (let i = 0; i < 20; i++) {
-        const d = document.createElement('div');
-        d.className = 'p-dot';
-        const s = 2 + Math.random() * 4;
-        d.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;`
-            + `background:${col[i%col.length]};`
-            + `animation-duration:${13+Math.random()*14}s;`
-            + `animation-delay:${Math.random()*13}s;`;
-        c.appendChild(d);
-    }
-})();
+function initPayment() { buildQR(0); }
 
-/* ── Auto-fill invoice number on first focus ── */
-document.getElementById('f_inv').addEventListener('focus', function(){
-    if (!this.value) {
-        const y = new Date().getFullYear();
-        this.value = `INV-${y}-${String(Math.floor(Math.random()*900)+100)}`;
-    }
-}, {once: true});
-
-/* ── Step navigation ── */
-function goStep(n) {
-    document.querySelectorAll('.sc').forEach(el => el.classList.remove('on'));
-    document.getElementById(`sc${n}`).classList.add('on');
-    updateProgress(n);
-    window.scrollTo({top:0, behavior:'smooth'});
+function updatePayAmount() {
+  const sel = document.getElementById('pay-invoice');
+  const opt = sel ? sel.options[sel.selectedIndex] : null;
+  const amt = opt ? (opt.dataset.amount||0) : 0;
+  const ai  = document.getElementById('pay-amount');
+  if (ai) ai.value = amt;
+  updateAmountDisplay(amt);
 }
 
-function updateProgress(active) {
-    for (let i = 1; i <= 3; i++) {
-        const si = document.getElementById(`si${i}`);
-        const circle = si.querySelector('.s-circle');
-        si.classList.remove('active','done');
-        if (i < active) {
-            si.classList.add('done');
-            circle.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"/></svg>`;
-        } else {
-            si.classList.toggle('active', i === active);
-            circle.textContent = i;
-        }
-        if (i <= 2) document.getElementById(`sl${i}`).classList.toggle('done', i < active);
-    }
+function updateAmountDisplay(amt) {
+  const n = parseInt(amt)||0;
+  const d = document.getElementById('pay-amount-display');
+  if (d) d.textContent = n ? '₹'+n.toLocaleString('en-IN') : '₹0';
+  const btn = document.getElementById('open-upi-btn');
+  if (btn) {
+    btn.style.display = n>0 ? 'flex' : 'none';
+    btn.href = `upi://pay?pa=${APP.UPI_ID}&pn=${encodeURIComponent(APP.UPI_NAME)}&am=${n}&cu=INR&tn=Webistzu-Payment`;
+  }
+  buildQR(n);
 }
 
-/* ── Form validation ── */
-function mark(id, valid) {
-    document.getElementById(id).classList.toggle('err', !valid);
-    return valid;
-}
-function clearErrs() { document.querySelectorAll('.finput,.fselect').forEach(e => e.classList.remove('err')); }
-
-/* ── Step 1 → Step 2 ── */
-function step1to2() {
-    clearErrs();
-    const v = {
-        name:  document.getElementById('f_name').value.trim(),
-        email: document.getElementById('f_email').value.trim(),
-        phone: document.getElementById('f_phone').value.trim(),
-        inv:   document.getElementById('f_inv').value.trim(),
-        svc:   document.getElementById('f_svc').value,
-        amt:   parseFloat(document.getElementById('f_amt').value),
-    };
-    let ok = true;
-    if (!v.name)  ok = mark('f_name',  false) && ok;
-    if (!v.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email)) ok = mark('f_email', false) && ok;
-    if (!v.phone) ok = mark('f_phone', false) && ok;
-    if (!v.inv)   ok = mark('f_inv',   false) && ok;
-    if (!v.svc)   ok = mark('f_svc',   false) && ok;
-    if (!v.amt || v.amt <= 0 || isNaN(v.amt)) ok = mark('f_amt', false) && ok;
-    if (!ok) { toast('Please fill in all required fields correctly', 'err'); return; }
-
-    fd = v;
-
-    /* Invoice card */
-    document.getElementById('d_name').textContent  = v.name;
-    document.getElementById('d_email').textContent = v.email;
-    document.getElementById('d_phone').textContent = v.phone;
-    document.getElementById('d_svc').textContent   = v.svc;
-    document.getElementById('d_inv').textContent   = v.inv;
-    document.getElementById('d_date').textContent  = new Date().toLocaleDateString('en-IN',
-        {day:'numeric', month:'long', year:'numeric'});
-    document.getElementById('d_amt').textContent   = `₹${fmt(v.amt)}`;
-    document.getElementById('payAmt').textContent  = fmt(v.amt);
-
-    /* UPI link + QR */
-    const link = buildUPILink(v.amt, v.inv);
-    document.getElementById('upiLinkEl').textContent = link;
-    document.getElementById('payNowBtn').href = link;
-    buildQR(link);
-
-    goStep(2);
+function buildQR(amount) {
+  const c = document.getElementById('qr-container');
+  if (!c) return;
+  c.innerHTML = '';
+  const link = `upi://pay?pa=${APP.UPI_ID}&pn=${encodeURIComponent(APP.UPI_NAME)}&am=${amount||''}&cu=INR&tn=Webistzu-Payment`;
+  const size = Math.min(Math.max(160, Math.floor(window.innerWidth*0.2)), 200);
+  try { new QRCode(c,{text:link,width:size,height:size,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.H}); } catch(e){}
 }
 
-/* ── UPI deep link ── */
-function buildUPILink(amount, invoice) {
-    return `upi://pay?pa=${encodeURIComponent(UPI_ID)}`
-         + `&pn=${encodeURIComponent(UPI_NAME)}`
-         + `&am=${amount}&cu=INR`
-         + `&tn=${encodeURIComponent('Invoice-' + invoice)}`;
-}
-
-/* ── Copy UPI ID ── */
 function copyUPI() {
-    const lbl = document.getElementById('copyLbl');
-    const done = () => { lbl.textContent='Copied!'; toast('UPI ID copied!','ok'); setTimeout(()=>lbl.textContent='Copy',2000); };
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(UPI_ID).then(done).catch(fallback);
-    } else { fallback(); }
-    function fallback() {
-        const ta = Object.assign(document.createElement('textarea'),
-            {value:UPI_ID, style:'position:fixed;opacity:0'});
-        document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-        document.body.removeChild(ta); done();
-    }
+  const t = document.createElement('textarea');
+  t.value = APP.UPI_ID;
+  document.body.appendChild(t); t.select();
+  document.execCommand('copy');
+  document.body.removeChild(t);
+  showToast('UPI ID copied!');
 }
 
-/* ── QR code (fluid size based on viewport) ── */
-function buildQR(link) {
-    const wrap = document.getElementById('qrcode');
-    wrap.innerHTML = '';
-    const boxEl = wrap.closest('.qr-box');
-    const size  = boxEl ? Math.max(110, boxEl.clientWidth - 20) : 178;
-
-    if (typeof QRCode !== 'undefined') {
-        new QRCode(wrap, {
-            text: link, width: size, height: size,
-            colorDark:'#000000', colorLight:'#ffffff',
-            correctLevel: QRCode.CorrectLevel.H
-        });
-    } else {
-        const img = document.createElement('img');
-        img.src   = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&ecc=H&data=${encodeURIComponent(link)}`;
-        img.alt   = 'QR Code';
-        img.style = `width:${size}px;height:${size}px;max-width:100%;`;
-        wrap.appendChild(img);
-    }
+function handleFile(file) {
+  if (!file) return;
+  uploadedFile = file;
+  document.getElementById('file-name').textContent = file.name+' ('+(file.size/1024).toFixed(1)+' KB)';
+  const p = document.getElementById('file-preview');
+  if (p) { p.src=URL.createObjectURL(file); p.style.display='block'; }
 }
 
-/* ── File upload preview ── */
-function handleUpload(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) { toast('Please upload an image file','err'); return; }
-    if (file.size > 10 * 1024 * 1024)   { toast('File must be under 10 MB','err'); return; }
-    uploadedFile = file;
-    const reader = new FileReader();
-    reader.onload = ev => {
-        document.getElementById('previewImg').src  = ev.target.result;
-        document.getElementById('previewFname').textContent = file.name;
-        document.getElementById('previewWrap').style.display = 'block';
-        document.getElementById('uploadZone').classList.add('has-file');
-    };
-    reader.readAsDataURL(file);
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.remove('drag');
+  const f = e.dataTransfer.files[0];
+  if (f) handleFile(f);
 }
 
-/* ── Drag & drop ── */
-(function(){
-    const zone = document.getElementById('uploadZone');
-    zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
-    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-    zone.addEventListener('drop', e => {
-        e.preventDefault(); zone.classList.remove('drag-over');
-        const file = e.dataTransfer.files[0];
-        if (file && file.type.startsWith('image/')) {
-            try { document.getElementById('f_ss').files = e.dataTransfer.files; } catch(_){}
-            handleUpload({target:{files:[file]}});
-        }
-    });
-})();
-
-/* ── Submit → POST to upload.php ── */
 async function submitPayment() {
-    document.getElementById('f_utr').classList.remove('err');
-    const utr = document.getElementById('f_utr').value.trim();
-    if (!utr)          { mark('f_utr',false); toast('Please enter your UTR / Transaction number','err'); return; }
-    if (!uploadedFile) { toast('Please upload your payment screenshot','err'); return; }
-
-    showLoading();
-
-    /* Build multipart form data */
-    const data = new FormData();
-    data.append('screenshot', uploadedFile, uploadedFile.name);
-    data.append('invoice', fd.inv   || '');
-    data.append('utr',     utr);
-    data.append('name',    fd.name  || '');
-    data.append('email',   fd.email || '');
-    data.append('phone',   fd.phone || '');
-    data.append('service', fd.svc   || '');
-    data.append('amount',  fd.amt   || '');
-
-    try {
-        const res  = await fetch('upload.php', {method:'POST', body:data});
-        const json = await res.json();
-        hideLoading();
-
-        if (json.success) {
-            const ref = `WBZ-${Date.now().toString(36).toUpperCase().slice(-8)}`;
-            document.getElementById('successRef').textContent =
-                `REF: ${ref}  ·  UTR: ${utr}  ·  INV: ${fd.inv}`;
-            launchConfetti();
-            document.getElementById('successEl').classList.add('on');
-        } else {
-            toast(`Upload failed: ${json.error || 'Please try again'}`, 'err');
-        }
-    } catch(err) {
-        hideLoading();
-        console.error('Upload error:', err);
-        toast('Could not connect to server. Please try again.', 'err');
+  const invoice = document.getElementById('pay-invoice')?.value;
+  const amount  = document.getElementById('pay-amount')?.value;
+  const utr     = document.getElementById('pay-utr')?.value?.trim();
+  const errEl   = document.getElementById('pay-error');
+  if (!invoice)      { errEl.textContent='Please select an invoice.';        errEl.style.display='block'; return; }
+  if (!amount||amount<=0){ errEl.textContent='Please enter the amount.';    errEl.style.display='block'; return; }
+  if (!utr)          { errEl.textContent='Please enter the UTR number.';     errEl.style.display='block'; return; }
+  if (!uploadedFile) { errEl.textContent='Please upload payment screenshot.'; errEl.style.display='block'; return; }
+  errEl.style.display='none';
+  const inv = APP.invoices.find(i=>i.id===invoice);
+  const fd  = new FormData();
+  fd.append('screenshot', uploadedFile, uploadedFile.name);
+  fd.append('invoice', invoice);
+  fd.append('utr',     utr);
+  fd.append('name',    APP.user.name);
+  fd.append('email',   APP.user.email);
+  fd.append('phone',   APP.user.phone||'');
+  fd.append('service', inv?.service||'');
+  fd.append('amount',  amount);
+  try {
+    const res  = await fetch('upload.php',{method:'POST',body:fd});
+    const json = await res.json();
+    if (json.success) {
+      const pid = 'PAY-'+String(APP.payments.length+1).padStart(3,'0');
+      APP.payments.push({id:pid,invoice,client:APP.user.name,amount:parseInt(amount),method:'UPI',utr,date:new Date().toISOString().slice(0,10),status:'Under Review',screenshot:json.filename});
+      document.getElementById('success-ref').innerHTML = `<div class="text-sm"><b>Invoice:</b> ${invoice} · <b>Amount:</b> ₹${parseInt(amount).toLocaleString('en-IN')}<br><b>UTR:</b> ${utr} · <b>Ref:</b> ${pid}</div>`;
+      document.getElementById('pay-success').classList.add('show');
+      uploadedFile = null;
+    } else {
+      errEl.textContent='Upload failed: '+(json.error||'Unknown error'); errEl.style.display='block';
     }
+  } catch(err) {
+    errEl.textContent='Network error. Please try again.'; errEl.style.display='block';
+  }
 }
 
-function closeSuccess() {
-    document.getElementById('successEl').classList.remove('on');
-    setTimeout(resetForm, 350);
+function closePaySuccess() {
+  document.getElementById('pay-success').classList.remove('show');
+  navigate('status');
 }
 
-function resetForm() {
-    document.querySelectorAll('.finput,.fselect').forEach(el => { el.value=''; el.classList.remove('err'); });
-    document.getElementById('previewWrap').style.display = 'none';
-    document.getElementById('uploadZone').classList.remove('has-file');
-    document.getElementById('qrcode').innerHTML = '';
-    uploadedFile = null; fd = {};
-    goStep(1);
-}
-
-/* ── Confetti ── */
-function launchConfetti() {
-    const wrap = document.getElementById('confettiWrap');
-    wrap.innerHTML = '';
-    const colors = ['#7c3aed','#2563eb','#10b981','#f59e0b','#ec4899','#06b6d4','#a78bfa','#34d399'];
-    for (let i = 0; i < 60; i++) {
-        const p = document.createElement('div');
-        p.className = 'confetti-p';
-        const sz = 4 + Math.random() * 8;
-        p.style.cssText = `left:${Math.random()*100}%;top:0;background:${colors[i%colors.length]};`
-            + `width:${sz}px;height:${sz}px;`
-            + `border-radius:${Math.random()>.5?'50%':'2px'};`
-            + `animation-duration:${1.2+Math.random()*1.8}s;`
-            + `animation-delay:${Math.random()*.7}s;`;
-        wrap.appendChild(p);
-    }
-}
-
-/* ── Loading ── */
-function showLoading() { document.getElementById('loadingEl').classList.add('on'); }
-function hideLoading()  { document.getElementById('loadingEl').classList.remove('on'); }
-
-/* ── Toast ── */
-function toast(msg, type='ok') {
-    const el = document.getElementById('toastEl');
-    el.textContent = msg;
-    el.className   = `toast toast-${type} show`;
-    clearTimeout(el._t);
-    el._t = setTimeout(() => el.classList.remove('show'), 3400);
-}
-
-/* ── Number formatter ── */
-function fmt(n) {
-    return parseFloat(n).toLocaleString('en-IN', {minimumFractionDigits:0, maximumFractionDigits:2});
-}
-
-/* ── Clear error on input ── */
-document.querySelectorAll('.finput,.fselect').forEach(el =>
-    el.addEventListener('input', () => el.classList.remove('err'))
-);
-
-/* ── Download Invoice (printable HTML) ── */
-function downloadInvoice() {
-    if (!fd.inv) { toast('Please complete step 1 first','err'); return; }
-    const date = new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
-    const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
-<title>Invoice ${fd.inv} — Webistzu</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',Arial,sans-serif;color:#1e293b;background:#fff;padding:clamp(20px,5vw,40px)}
-.page{max-width:740px;margin:0 auto;border:1.5px solid #e2e8f0;border-radius:14px;overflow:hidden}
-.top{padding:28px 32px;background:linear-gradient(135deg,#f8f5ff,#eff6ff);border-bottom:1.5px solid #e2e8f0;
-  display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px}
-.brand{font-size:28px;font-weight:900;color:#7c3aed}.tag{font-size:11px;color:#94a3b8;margin-top:3px}
-.ibadge{background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;padding:7px 18px;
-  border-radius:20px;font-size:13px;font-weight:700}
-.inum{font-size:12px;color:#94a3b8;margin-top:4px;font-family:monospace}
-.idate{font-size:12px;color:#94a3b8;margin-top:2px}
-.status{display:inline-block;background:#fef9c3;color:#854d0e;padding:3px 11px;border-radius:12px;
-  font-size:10px;font-weight:700;text-transform:uppercase;margin-top:5px}
-.body{padding:28px 32px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-bottom:32px}
-.blk h3{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:#94a3b8;margin-bottom:10px;font-weight:600}
-.blk p{font-size:13px;line-height:1.85;color:#334155}
-table{width:100%;border-collapse:collapse;margin-bottom:24px}
-thead th{background:#f8fafc;padding:11px 14px;text-align:left;font-size:11px;text-transform:uppercase;
-  letter-spacing:.5px;color:#64748b;border-bottom:2px solid #e2e8f0;font-weight:600}
-thead th:last-child{text-align:right}
-tbody td{padding:13px 14px;border-bottom:1px solid #f1f5f9;font-size:13px;color:#334155}
-tbody td:last-child{text-align:right}
-.total-row td{background:#f5f3ff;font-weight:800;font-size:15px;color:#7c3aed}
-.foot{text-align:center;padding:18px 28px 26px;border-top:1px solid #f1f5f9}
-.foot p{font-size:12px;color:#94a3b8;line-height:1.7}
-@media(max-width:500px){.g2{grid-template-columns:1fr}.top{flex-direction:column}}
-@media print{body{padding:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
-</style></head><body><div class="page">
-<div class="top">
-  <div><div class="brand">Webistzu</div><div class="tag">Webpages. Web Presence. Webistzu.</div></div>
-  <div style="text-align:right">
-    <div class="ibadge">INVOICE</div>
-    <div class="inum">${fd.inv}</div>
-    <div class="idate">${date}</div>
-    <div><span class="status">Pending Payment</span></div>
+/* ═══════════ INVOICES ═══════════ */
+function viewInvoice(id) {
+  const inv = APP.invoices.find(i=>i.id===id);
+  if (!inv) return;
+  document.getElementById('invoice-modal-body').innerHTML = `
+<div class="invoice-preview">
+  <div class="inv-header">
+    <div><div class="inv-company">Webistzu</div><div style="font-size:12px;color:#555;margin-top:4px;">Technologies Pvt Ltd<br>contact@webistzu.com · +91 99999 99999</div></div>
+    <div class="inv-details">
+      <div style="font-size:18px;font-weight:800;color:#7c3aed;">INVOICE</div>
+      <div style="margin-top:8px;">No: <b>${inv.id}</b></div>
+      <div>Date: <b>${inv.date}</b></div>
+      <div>Due: <b>${inv.due}</b></div>
+      <div style="margin-top:6px;padding:4px 10px;background:${inv.status==='Paid'?'#10b981':inv.status==='Overdue'?'#ef4444':'#f59e0b'};color:#fff;border-radius:4px;font-weight:700;font-size:12px;display:inline-block;">${inv.status}</div>
+    </div>
   </div>
-</div>
-<div class="body">
-  <div class="g2">
-    <div class="blk"><h3>Bill To</h3><p><strong>${fd.name}</strong><br>${fd.email}<br>${fd.phone}</p></div>
-    <div class="blk"><h3>Pay To (UPI)</h3><p><strong>${UPI_ID}</strong><br>${UPI_NAME}<br>Currency: INR (₹)</p></div>
-  </div>
-  <table>
-    <thead><tr><th>#</th><th>Description</th><th>Amount</th></tr></thead>
+  <div class="inv-to"><h4>Bill To</h4><div style="font-weight:700;">${inv.client}</div></div>
+  <table class="inv-table">
+    <thead><tr><th>Description</th><th style="text-align:right;">Qty</th><th style="text-align:right;">Rate</th><th style="text-align:right;">Amount</th></tr></thead>
     <tbody>
-      <tr><td>01</td><td>${fd.svc}</td><td>₹${fmt(fd.amt)}</td></tr>
-      <tr class="total-row"><td colspan="2"><strong>Total Due</strong></td><td><strong>₹${fmt(fd.amt)}</strong></td></tr>
+      ${inv.items.map(it=>`<tr><td>${it.desc}</td><td style="text-align:right;">${it.qty}</td><td style="text-align:right;">₹${it.rate.toLocaleString('en-IN')}</td><td style="text-align:right;">₹${(it.qty*it.rate).toLocaleString('en-IN')}</td></tr>`).join('')}
+      <tr class="inv-total-row" style="background:#f9f7ff;"><td colspan="3" style="text-align:right;font-weight:800;">TOTAL</td><td style="text-align:right;font-weight:800;color:#7c3aed;font-size:16px;">₹${inv.amount.toLocaleString('en-IN')}</td></tr>
     </tbody>
   </table>
-  <div class="foot">
-    <p>Thank you for choosing Webistzu!</p>
-    <p>Questions? Email <strong>support@webistzu.com</strong></p>
-    <p style="margin-top:8px;font-size:10px;">© 2026 Webistzu. All rights reserved.</p>
-  </div>
-</div></div></body></html>`;
-
-    const blob = new Blob([html],{type:'text/html'});
-    const url  = URL.createObjectURL(blob);
-    const a    = Object.assign(document.createElement('a'),{href:url,download:`Invoice-${fd.inv}-Webistzu.html`});
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast('Invoice downloaded!','ok');
+  <div class="inv-footer">Thank you for choosing Webistzu! · Payment due within 7 days.</div>
+</div>
+<div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;">
+  <button class="btn btn-grad" onclick="downloadInvoice('${inv.id}')">⬇ Download</button>
+  <button class="btn btn-ghost" onclick="window.print()">🖨 Print</button>
+  ${inv.status!=='Paid'?`<button class="btn btn-green" onclick="closeModal('invoice-modal');navigate('payment')">💳 Pay Now</button>`:''}
+  <button class="btn btn-ghost" onclick="closeModal('invoice-modal')">Close</button>
+</div>`;
+  document.getElementById('invoice-modal').classList.add('show');
 }
 
-/* ── Rebuild QR on window resize (debounced) ── */
-let resizeTimer;
-window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-        const link = document.getElementById('payNowBtn').href;
-        if (link && link.startsWith('upi://')) buildQR(link);
-    }, 300);
+function downloadInvoice(id) {
+  const inv = APP.invoices.find(i=>i.id===id);
+  if (!inv) return;
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Invoice ${inv.id}</title>
+<style>body{font-family:Arial,sans-serif;margin:40px;color:#111;}.header{display:flex;justify-content:space-between;margin-bottom:30px;padding-bottom:20px;border-bottom:2px solid #7c3aed;}.company{font-size:24px;font-weight:800;color:#7c3aed;}table{width:100%;border-collapse:collapse;}th{background:#7c3aed;color:#fff;padding:10px 12px;text-align:left;}td{padding:10px 12px;border-bottom:1px solid #eee;}.total{font-weight:800;background:#f9f7ff;}.footer{text-align:center;color:#999;font-size:12px;margin-top:30px;padding-top:20px;border-top:1px solid #eee;}</style></head>
+<body><div class="header"><div><div class="company">Webistzu</div><div style="font-size:12px;color:#555;margin-top:4px;">Technologies Pvt Ltd · contact@webistzu.com</div></div>
+<div style="text-align:right;"><div style="font-size:20px;font-weight:800;color:#7c3aed;">INVOICE</div><div style="margin-top:6px;font-size:13px;">No: <b>${inv.id}</b><br>Date: <b>${inv.date}</b><br>Due: <b>${inv.due}</b></div></div></div>
+<div style="margin-bottom:20px;"><b>Bill To:</b> ${inv.client}</div>
+<table><thead><tr><th>Description</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead><tbody>
+${inv.items.map(it=>`<tr><td>${it.desc}</td><td>${it.qty}</td><td>₹${it.rate.toLocaleString('en-IN')}</td><td>₹${(it.qty*it.rate).toLocaleString('en-IN')}</td></tr>`).join('')}
+<tr class="total"><td colspan="3" style="text-align:right;">TOTAL</td><td style="color:#7c3aed;font-size:16px;">₹${inv.amount.toLocaleString('en-IN')}</td></tr>
+</tbody></table>
+<div class="footer">Thank you for choosing Webistzu!</div></body></html>`;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([html],{type:'text/html'}));
+  a.download = inv.id+'.html';
+  a.click();
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+/* ═══════════ QUOTE ═══════════ */
+function calcQuote() {
+  let total = 0;
+  APP.quoteServices.forEach(s=>{ const cb=document.getElementById('qs-'+s.id); if(cb&&cb.checked) total+=s.monthly; });
+  const el = document.getElementById('quote-total');
+  if (el) el.style.display = total>0?'block':'none';
+  const pe = document.getElementById('quote-price');
+  if (pe) pe.textContent = '₹'+total.toLocaleString('en-IN');
+}
+
+function submitQuote() {
+  const sel = APP.quoteServices.filter(s=>{ const cb=document.getElementById('qs-'+s.id); return cb&&cb.checked; });
+  if (!sel.length) { showToast('Please select at least one service.'); return; }
+  showToast("Quote request submitted! We'll contact you within 24 hours.");
+  setTimeout(()=>navigate('dashboard'),2000);
+}
+
+function printQuote() {
+  const name = document.getElementById('q-name')?.value||APP.user.name;
+  const sel  = APP.quoteServices.filter(s=>{ const cb=document.getElementById('qs-'+s.id); return cb&&cb.checked; });
+  if (!sel.length) { showToast('Select services first.'); return; }
+  const total = sel.reduce((s,x)=>s+x.monthly,0);
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Quotation</title>
+<style>body{font-family:Arial,sans-serif;margin:40px;}h1{color:#7c3aed;}table{width:100%;border-collapse:collapse;}th{background:#7c3aed;color:#fff;padding:10px;}td{padding:10px;border-bottom:1px solid #eee;}.total{font-weight:800;background:#f9f7ff;font-size:16px;color:#7c3aed;}</style></head>
+<body><h1>Webistzu — Quotation</h1><p>For: <b>${name}</b> · Date: <b>${new Date().toLocaleDateString('en-IN')}</b></p>
+<table><thead><tr><th>Service</th><th>Estimated Cost</th></tr></thead><tbody>
+${sel.map(s=>`<tr><td>${s.name}</td><td>₹${s.monthly.toLocaleString('en-IN')}</td></tr>`).join('')}
+<tr class="total"><td>TOTAL ESTIMATE</td><td>₹${total.toLocaleString('en-IN')}</td></tr>
+</tbody></table><p style="margin-top:20px;font-size:12px;color:#666;">Estimate only. Final pricing confirmed after consultation. Valid for 30 days.</p></body></html>`;
+  const w = window.open('','_blank');
+  w.document.write(html); w.document.close(); w.print();
+}
+
+function quoteService(name) {
+  navigate('quote');
+  setTimeout(()=>{
+    const svc = APP.quoteServices.find(s=>s.name.toLowerCase().includes(name.split(' ')[0].toLowerCase()));
+    if (svc) { const cb=document.getElementById('qs-'+svc.id); if(cb){cb.checked=true;calcQuote();} }
+  },100);
+}
+
+function toggleYearly() { APP.yearly=!APP.yearly; navigate('pricing'); }
+
+/* ═══════════ NOTIFICATIONS ═══════════ */
+function markAllRead() {
+  APP.notifications.forEach(n=>n.unread=false);
+  document.getElementById('notif-dot').style.display='none';
+  const nb = document.getElementById('notif-badge');
+  if (nb) nb.style.display='none';
+  navigate('notifications');
+}
+
+function readNotif(id) {
+  const n = APP.notifications.find(x=>x.id===id);
+  if (n) n.unread=false;
+  const el = document.getElementById('notif-'+id);
+  if (el) { el.classList.remove('unread'); const btn=el.querySelector('button'); if(btn) btn.remove(); }
+  const unread = APP.notifications.filter(n=>n.unread).length;
+  const dot=document.getElementById('notif-dot'); const nb=document.getElementById('notif-badge');
+  if (!unread) { if(dot) dot.style.display='none'; if(nb) nb.style.display='none'; }
+  else if (nb) nb.textContent=unread;
+}
+
+/* ═══════════ PROFILE ═══════════ */
+function saveProfile() {
+  const name = document.getElementById('p-name')?.value?.trim();
+  const email= document.getElementById('p-email')?.value?.trim();
+  if (name)  { APP.user.name=name;  document.getElementById('user-name').textContent=name;  document.getElementById('user-avatar').textContent=name[0]; }
+  if (email) { APP.user.email=email; document.getElementById('user-email').textContent=email; }
+  showToast('Profile updated!');
+}
+
+function changePass() {
+  const oldp=document.getElementById('p-old')?.value;
+  const newp=document.getElementById('p-new')?.value;
+  if (!oldp||!newp) { showToast('Please fill both fields.'); return; }
+  if (oldp!==APP.user.pass) { showToast('Current password is incorrect.'); return; }
+  APP.user.pass=newp;
+  const u=APP.users.find(x=>x.email===APP.user.email); if(u) u.pass=newp;
+  showToast('Password changed!');
+}
+
+/* ═══════════ ADMIN ACTIONS ═══════════ */
+function approvePayment(id) {
+  const p=APP.payments.find(x=>x.id===id);
+  if (p) { p.status='Approved'; const inv=APP.invoices.find(i=>i.id===p.invoice); if(inv) inv.status='Paid'; }
+  navigate('admin-payments'); showToast('Payment approved!');
+}
+function rejectPayment(id) {
+  const p=APP.payments.find(x=>x.id===id);
+  if (p) p.status='Rejected';
+  navigate('admin-payments'); showToast('Payment rejected.');
+}
+
+/* ═══════════ SUPPORT ═══════════ */
+function toggleFaq(i) {
+  const a=document.getElementById('faq-a-'+i); const ar=document.getElementById('faq-arrow-'+i);
+  if (a) { a.classList.toggle('open'); if(ar) ar.textContent=a.classList.contains('open')?'▲':'▼'; }
+}
+function sendSupport() {
+  const sub=document.getElementById('sup-subject')?.value?.trim();
+  const msg=document.getElementById('sup-msg')?.value?.trim();
+  if (!sub||!msg) { showToast('Please fill in subject and message.'); return; }
+  showToast("Message sent! We'll reply within 24 hours.");
+  document.getElementById('sup-subject').value='';
+  document.getElementById('sup-msg').value='';
+}
+
+/* ═══════════ CHARTS ═══════════ */
+function initCharts() {
+  setTimeout(()=>{
+    const rc=document.getElementById('revenue-chart');
+    const sc=document.getElementById('status-chart');
+    const gridColor='rgba(255,255,255,.05)';const tick={color:'#94a3b8'};
+    if (rc) new Chart(rc,{type:'line',data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],datasets:[{label:'Revenue (₹)',data:[28000,35000,42000,38000,55000,48000],borderColor:'#7c3aed',backgroundColor:'rgba(124,58,237,.15)',fill:true,tension:.4,pointBackgroundColor:'#7c3aed',pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8'}}},scales:{x:{ticks:tick,grid:{color:gridColor}},y:{ticks:tick,grid:{color:gridColor}}}}});
+    if (sc) new Chart(sc,{type:'doughnut',data:{labels:['Approved','Under Review','Pending','Rejected'],datasets:[{data:[2,1,1,0],backgroundColor:['#10b981','#4f46e5','#f59e0b','#ef4444'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',padding:14}}}}});
+  },100);
+}
+
+/* ═══════════ TOAST ═══════════ */
+let _tt;
+function showToast(msg) {
+  let t=document.getElementById('toast');
+  if (!t) {
+    t=document.createElement('div'); t.id='toast';
+    t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:10px 20px;border-radius:8px;font-size:13px;z-index:9999;box-shadow:var(--shadow);transition:.2s;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis;';
+    document.body.appendChild(t);
+  }
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(_tt); _tt=setTimeout(()=>t.style.opacity='0',3000);
+}
+
+/* ═══════════ KEYBOARD / MISC ═══════════ */
+document.addEventListener('keydown',e=>{
+  if (e.key==='Escape') {
+    document.querySelectorAll('.modal-overlay.show,.success-overlay.show').forEach(m=>m.classList.remove('show'));
+    closeSidebar();
+  }
+  if (e.key==='Enter' && document.getElementById('login-screen').style.display!=='none') doLogin();
+});
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',function(e){ if(e.target===this) this.classList.remove('show'); });
 });
 </script>
 </body>
