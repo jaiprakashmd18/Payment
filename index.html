@@ -79,7 +79,7 @@ a{ color:inherit; text-decoration:none; }
 @keyframes pulse   { 0%,100%{ opacity:1 } 50%{ opacity:.45 } }
 @keyframes glow    { 0%,100%{ box-shadow:var(--glow) } 50%{ box-shadow:0 0 48px rgba(37,99,235,.6) } }
 @keyframes float   { 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-7px) } }
-@keyframes slideIn { from{ opacity:0; transform:translateX(-14px) } to{ opacity:1; transform:translateX(0) } }
+@keyframes checkPop{ 0%{ transform:scale(0) } 60%{ transform:scale(1.25) } 100%{ transform:scale(1) } }
 
 .fade-up{ animation:fadeUp .45s ease both; }
 .d1{ animation-delay:.08s; } .d2{ animation-delay:.16s; }
@@ -516,7 +516,8 @@ a{ color:inherit; text-decoration:none; }
    STEP PANELS
 ───────────────────────────────────── */
 .step{ display:none; }
-.step.on{ display:block; animation:fadeUp .4s ease both; }
+.step.on{ display:block; }
+.step.on.animate-in{ animation:fadeUp .38s ease both; }
 
 /* ─────────────────────────────────────
    FOOTER
@@ -1052,22 +1053,31 @@ function sanitize(s)  { return String(s).replace(/[<>"'&]/g,'').trim(); }
    STEP NAVIGATION
 ═════════════════════════════════════════ */
 function showStep(n){
-  document.querySelectorAll('.step').forEach(p=>p.classList.remove('on'));
-  document.getElementById('s'+n).classList.add('on');
-  /* stepper dots */
+  /* hide all, show target with animation replay */
+  document.querySelectorAll('.step').forEach(p=>{
+    p.classList.remove('on','animate-in');
+  });
+  const panel = document.getElementById('s'+n);
+  if(panel){
+    panel.classList.add('on');
+    void panel.offsetWidth; /* force reflow so animation replays */
+    panel.classList.add('animate-in');
+  }
+  /* stepper dots: step 4 = all done */
+  const allDone = n > 3;
   for(let i=1;i<=3;i++){
     const si  = document.getElementById('si'+i);
     const dot = si?.querySelector('.s-dot');
     if(!si||!dot) continue;
     si.classList.remove('active','done');
-    if(i<n){ si.classList.add('done'); dot.textContent='✓'; }
-    else if(i===n){ si.classList.add('active'); dot.textContent=String(i); }
-    else{ dot.textContent=String(i); }
+    if(allDone || i<n){ si.classList.add('done'); dot.textContent='✓'; }
+    else if(i===n)    { si.classList.add('active'); dot.textContent=String(i); }
+    else              { dot.textContent=String(i); }
   }
   /* connector lines */
   for(let i=1;i<=2;i++){
     const sc=document.getElementById('sc'+i);
-    if(sc) sc.classList.toggle('done', n>i);
+    if(sc) sc.classList.toggle('done', allDone || n>i);
   }
   ST.step=n;
   window.scrollTo({top:0,behavior:'smooth'});
@@ -1460,6 +1470,8 @@ function toast(msg){
    INIT
 ═════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded',()=>{
+  ST.step=1; /* step 1 is active on load */
+
   /* default due date = 7 days out */
   const d=new Date(); d.setDate(d.getDate()+7);
   const fi=document.getElementById('f-due');
