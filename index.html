@@ -2,865 +2,968 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Webistzu — Professional Web Development Billing Portal. Pay invoices securely via UPI.">
-<title>Webistzu — Payment Portal</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="description" content="Webistzu — Secure invoice payment portal for web development services.">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta name="referrer" content="no-referrer">
+<!-- CSP: tighten in production by removing 'unsafe-inline' and using a nonce -->
+<meta http-equiv="Content-Security-Policy"
+  content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; frame-ancestors 'none';">
+<title>Webistzu — Secure Payment Portal</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+        integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSFjZmBRX76KJvzGXDi1j0G/AbKbqLKpfg==" crossorigin="anonymous"></script>
 <style>
-/* ═══════════════════════════════════
-   TOKENS
-═══════════════════════════════════ */
+/* ─────────────────────────────────────
+   DESIGN TOKENS
+───────────────────────────────────── */
 :root{
-  --bg:#040815;
-  --bg2:#080d1f;
-  --bg3:#0c1228;
-  --surface:rgba(255,255,255,.03);
-  --surface2:rgba(255,255,255,.06);
-  --border:rgba(255,255,255,.07);
-  --border2:rgba(255,255,255,.12);
-  --blue:#2563eb;
-  --blue2:#1d4ed8;
-  --blue3:#3b82f6;
-  --cyan:#38bdf8;
-  --green:#10b981;
-  --red:#ef4444;
-  --yellow:#f59e0b;
-  --orange:#f97316;
-  --text:#f1f5f9;
-  --muted:#64748b;
-  --muted2:#94a3b8;
-  --r:14px;--r2:9px;--r3:6px;
-  --sh:0 20px 60px rgba(0,0,0,.5);
-  --sh2:0 4px 20px rgba(0,0,0,.3);
+  --bg:     #030711;
+  --bg2:    #070d1e;
+  --bg3:    #0b1228;
+  --surf:   rgba(255,255,255,.03);
+  --surf2:  rgba(255,255,255,.06);
+  --b:      rgba(255,255,255,.07);   /* border */
+  --b2:     rgba(255,255,255,.13);   /* border hover */
+  --blue:   #2563eb;
+  --blue2:  #1d4ed8;
+  --blue3:  #60a5fa;
+  --cyan:   #38bdf8;
+  --green:  #10b981;
+  --red:    #f87171;
+  --yellow: #fbbf24;
+  --text:   #f1f5f9;
+  --sub:    #94a3b8;
+  --muted:  #475569;
+  --r:      14px;
+  --r2:     9px;
+  --r3:     5px;
+  --sh:     0 4px 24px rgba(0,0,0,.45);
+  --glow:   0 0 28px rgba(37,99,235,.35);
+
+  /* fluid spacing */
+  --pad-x:  clamp(14px, 4vw, 28px);
+  --pad-y:  clamp(18px, 4vw, 28px);
 }
-*{margin:0;padding:0;box-sizing:border-box;}
-html{scroll-behavior:smooth;}
+
+/* ─────────────────────────────────────
+   RESET / BASE
+───────────────────────────────────── */
+*, *::before, *::after{ margin:0; padding:0; box-sizing:border-box; }
+html{ height:100%; scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
 body{
   font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
-  background:var(--bg);color:var(--text);min-height:100vh;
-  overflow-x:hidden;line-height:1.5;
+  background:var(--bg); color:var(--text);
+  min-height:100%; overflow-x:hidden; line-height:1.55;
+  /* notch-safe padding */
+  padding-left:env(safe-area-inset-left);
+  padding-right:env(safe-area-inset-right);
+  padding-bottom:env(safe-area-inset-bottom);
 }
-
-/* ── Scrollbar ── */
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:rgba(37,99,235,.6);border-radius:3px}
-
-/* ── Animations ── */
-@keyframes fadeIn  {from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-@keyframes slideIn {from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
-@keyframes pulse   {0%,100%{opacity:1}50%{opacity:.5}}
-@keyframes spin    {to{transform:rotate(360deg)}}
-@keyframes glow    {0%,100%{box-shadow:0 0 20px rgba(37,99,235,.3)}50%{box-shadow:0 0 40px rgba(37,99,235,.6)}}
-@keyframes float   {0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-@keyframes shimmer {from{background-position:-200% 0}to{background-position:200% 0}}
-
-.animate{animation:fadeIn .5s ease both;}
-.animate-delay-1{animation-delay:.1s;}
-.animate-delay-2{animation-delay:.2s;}
-.animate-delay-3{animation-delay:.3s;}
-.animate-delay-4{animation-delay:.4s;}
-
-/* ══════════════════════════════════
-   HEADER / NAV
-══════════════════════════════════ */
-.site-header{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  padding:0 24px;height:64px;
-  display:flex;align-items:center;justify-content:space-between;
-  background:rgba(4,8,21,.85);backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--border);
+img{ max-width:100%; display:block; }
+button,input,select,textarea{
+  font-family:inherit; font-size:inherit;
+  border:none; outline:none; background:none; color:inherit;
 }
-.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+a{ color:inherit; text-decoration:none; }
+::-webkit-scrollbar{ width:5px; height:5px; }
+::-webkit-scrollbar-track{ background:transparent; }
+::-webkit-scrollbar-thumb{ background:rgba(37,99,235,.5); border-radius:3px; }
+
+/* ─────────────────────────────────────
+   ANIMATIONS
+───────────────────────────────────── */
+@keyframes fadeUp  { from{ opacity:0; transform:translateY(18px) } to{ opacity:1; transform:translateY(0) } }
+@keyframes spin    { to{ transform:rotate(360deg) } }
+@keyframes pulse   { 0%,100%{ opacity:1 } 50%{ opacity:.45 } }
+@keyframes glow    { 0%,100%{ box-shadow:var(--glow) } 50%{ box-shadow:0 0 48px rgba(37,99,235,.6) } }
+@keyframes float   { 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-7px) } }
+@keyframes slideIn { from{ opacity:0; transform:translateX(-14px) } to{ opacity:1; transform:translateX(0) } }
+
+.fade-up{ animation:fadeUp .45s ease both; }
+.d1{ animation-delay:.08s; } .d2{ animation-delay:.16s; }
+.d3{ animation-delay:.24s; } .d4{ animation-delay:.32s; }
+
+/* ─────────────────────────────────────
+   HEADER
+───────────────────────────────────── */
+.hdr{
+  position:sticky; top:0; z-index:200;
+  height:58px; padding:0 var(--pad-x);
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  background:rgba(3,7,17,.88); backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--b);
+}
+.logo{ display:flex; align-items:center; gap:10px; }
 .logo-mark{
-  width:36px;height:36px;border-radius:9px;
+  width:34px; height:34px; border-radius:9px; flex-shrink:0;
   background:linear-gradient(135deg,var(--blue),var(--cyan));
-  display:flex;align-items:center;justify-content:center;
-  font-weight:900;font-size:16px;color:#fff;letter-spacing:-1px;
-  box-shadow:0 0 20px rgba(37,99,235,.4);
+  display:flex; align-items:center; justify-content:center;
+  font-weight:900; font-size:16px; letter-spacing:-1px; color:#fff;
+  box-shadow:var(--glow);
 }
-.logo-text{font-size:20px;font-weight:800;letter-spacing:-.5px;
-  background:linear-gradient(135deg,#fff 40%,var(--cyan));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.logo-tagline{font-size:10px;color:var(--muted);letter-spacing:.3px;display:none;}
-.header-actions{display:flex;align-items:center;gap:10px;}
-.header-badge{
-  font-size:11px;padding:4px 10px;border-radius:20px;font-weight:600;
-  background:rgba(37,99,235,.15);border:1px solid rgba(37,99,235,.3);color:var(--blue3);
+.logo-name{
+  font-size:clamp(17px,4vw,20px); font-weight:800; letter-spacing:-.4px;
+  background:linear-gradient(120deg,#fff 40%,var(--cyan));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.logo-tag{
+  font-size:10px; color:var(--muted); font-style:italic; letter-spacing:.2px;
+  display:none; /* shown at ≥440px */
+}
+.secure-pill{
+  display:flex; align-items:center; gap:5px; flex-shrink:0;
+  font-size:11px; font-weight:600; color:var(--blue3);
+  background:rgba(37,99,235,.12); border:1px solid rgba(37,99,235,.25);
+  padding:5px 11px; border-radius:20px;
 }
 
-/* ══════════════════════════════════
-   HERO / PAGE TOP
-══════════════════════════════════ */
+/* ─────────────────────────────────────
+   PAGE TOP (gradient area)
+───────────────────────────────────── */
 .page-top{
-  padding-top:64px;
   background:
-    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(37,99,235,.12) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 0%, rgba(56,189,248,.08) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 55% at 15% 0%,rgba(37,99,235,.13) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 45% at 85% 0%,rgba(56,189,248,.08) 0%,transparent 55%),
     var(--bg);
+  padding-bottom:6px;
 }
 .hero{
-  text-align:center;padding:56px 24px 40px;
-  max-width:700px;margin:0 auto;
+  text-align:center;
+  padding:clamp(36px,6vw,60px) var(--pad-x) clamp(24px,4vw,36px);
+  max-width:640px; margin:0 auto;
 }
-.hero-eyebrow{
-  display:inline-flex;align-items:center;gap:6px;
-  font-size:12px;font-weight:600;color:var(--cyan);
-  background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);
-  padding:5px 14px;border-radius:20px;margin-bottom:20px;letter-spacing:.5px;
+.eyebrow{
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:11px; font-weight:700; letter-spacing:.8px; text-transform:uppercase;
+  color:var(--cyan);
+  background:rgba(56,189,248,.1); border:1px solid rgba(56,189,248,.2);
+  padding:5px 13px; border-radius:20px; margin-bottom:18px;
 }
 .hero h1{
-  font-size:clamp(26px,5vw,42px);font-weight:800;line-height:1.15;
-  letter-spacing:-.5px;margin-bottom:12px;
-  background:linear-gradient(135deg,#fff 50%,var(--cyan));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  font-size:clamp(22px,5vw,38px); font-weight:800; line-height:1.2;
+  letter-spacing:-.5px; margin-bottom:8px;
+  background:linear-gradient(135deg,#fff 55%,var(--cyan));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
 }
-.hero-tagline{font-size:14px;color:var(--muted2);}
+.hero-sub{ font-size:clamp(12px,2.5vw,14px); color:var(--sub); }
 
-/* ══════════════════════════════════
-   STEPPER
-══════════════════════════════════ */
+/* ─────────────────────────────────────
+   STEPPER  (3-step progress bar)
+───────────────────────────────────── */
+.stepper-wrap{ padding:0 var(--pad-x) 28px; }
 .stepper{
-  display:flex;justify-content:center;align-items:center;
-  gap:0;max-width:480px;margin:0 auto 36px;padding:0 24px;
+  display:flex; align-items:flex-start; justify-content:center;
+  max-width:440px; margin:0 auto;
 }
-.step-item{display:flex;align-items:center;flex:1;}
-.step-dot{
-  width:34px;height:34px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:700;flex-shrink:0;
-  border:2px solid var(--border2);color:var(--muted);
-  background:var(--bg2);transition:.3s;
+.s-step{ display:flex; flex-direction:column; align-items:center; flex:1; }
+.s-dot{
+  width:clamp(28px,7vw,34px); height:clamp(28px,7vw,34px);
+  border-radius:50%; border:2px solid var(--b2);
+  background:var(--bg2); color:var(--muted);
+  display:flex; align-items:center; justify-content:center;
+  font-size:clamp(11px,2.5vw,13px); font-weight:700;
+  transition:all .3s; flex-shrink:0;
 }
-.step-item.done .step-dot{background:var(--green);border-color:var(--green);color:#fff;}
-.step-item.active .step-dot{
+.s-step.done   .s-dot{ background:var(--green); border-color:var(--green); color:#fff; }
+.s-step.active .s-dot{
   background:linear-gradient(135deg,var(--blue),var(--blue3));
-  border-color:var(--blue);color:#fff;
-  box-shadow:0 0 20px rgba(37,99,235,.5);
-  animation:glow 2s ease infinite;
+  border-color:var(--blue); color:#fff;
+  animation:glow 2.5s ease infinite;
 }
-.step-label{font-size:11px;font-weight:600;margin-top:6px;color:var(--muted);text-align:center;}
-.step-item.active .step-label,.step-item.done .step-label{color:var(--text);}
-.step-line{flex:1;height:2px;background:var(--border);transition:.3s;}
-.step-item.done .step-line{background:var(--green);}
-.step-connector{display:flex;flex-direction:column;align-items:center;flex:1;}
+.s-lbl{
+  font-size:clamp(9px,2vw,11px); font-weight:600; color:var(--muted);
+  margin-top:5px; text-align:center; white-space:nowrap;
+}
+.s-step.done   .s-lbl,
+.s-step.active .s-lbl{ color:var(--text); }
+.s-connector{
+  flex:1; height:2px; background:var(--b); margin-top:clamp(13px,3.5vw,16px);
+  transition:background .3s;
+}
+.s-connector.done{ background:var(--green); }
 
-/* ══════════════════════════════════
-   MAIN LAYOUT
-══════════════════════════════════ */
-.main{max-width:900px;margin:0 auto;padding:0 16px 80px;}
+/* ─────────────────────────────────────
+   MAIN CONTENT AREA
+───────────────────────────────────── */
+.main{
+  width:100%; max-width:880px;
+  margin:0 auto;
+  padding:0 var(--pad-x) clamp(60px,10vw,100px);
+}
 
-/* ══════════════════════════════════
-   STEP PANELS
-══════════════════════════════════ */
-.step-panel{display:none;}
-.step-panel.active{display:block;animation:fadeIn .4s ease both;}
-
-/* ══════════════════════════════════
+/* ─────────────────────────────────────
    GLASS CARD
-══════════════════════════════════ */
+───────────────────────────────────── */
 .card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);padding:28px;
-  backdrop-filter:blur(10px);
+  background:var(--surf); border:1px solid var(--b);
+  border-radius:var(--r); padding:var(--pad-y);
+  backdrop-filter:blur(8px);
   transition:border-color .2s;
 }
-.card:hover{border-color:var(--border2);}
-.card+.card{margin-top:16px;}
-.card-header{
-  display:flex;align-items:center;gap:12px;margin-bottom:22px;
-  padding-bottom:16px;border-bottom:1px solid var(--border);
+.card:hover{ border-color:var(--b2); }
+.card + .card{ margin-top:14px; }
+.card-hd{
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:var(--pad-y);
+  padding-bottom:14px; border-bottom:1px solid var(--b);
 }
-.card-icon{
-  width:42px;height:42px;border-radius:10px;
-  background:rgba(37,99,235,.15);border:1px solid rgba(37,99,235,.2);
-  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
+.card-ico{
+  width:40px; height:40px; border-radius:10px; flex-shrink:0;
+  background:rgba(37,99,235,.14); border:1px solid rgba(37,99,235,.2);
+  display:flex; align-items:center; justify-content:center; font-size:18px;
 }
-.card-title{font-size:16px;font-weight:700;}
-.card-subtitle{font-size:12px;color:var(--muted2);margin-top:2px;}
+.card-ti{ font-size:clamp(14px,3.5vw,16px); font-weight:700; }
+.card-st{ font-size:12px; color:var(--sub); margin-top:1px; }
 
-/* ══════════════════════════════════
-   FORM ELEMENTS
-══════════════════════════════════ */
-.form-grid{display:grid;gap:14px;}
-.form-grid.cols2{grid-template-columns:1fr 1fr;}
-.form-grid.cols3{grid-template-columns:1fr 1fr 1fr;}
-.field{display:flex;flex-direction:column;gap:6px;}
-.field label{font-size:12px;font-weight:600;color:var(--muted2);letter-spacing:.4px;text-transform:uppercase;}
-.field input,.field select,.field textarea{
-  padding:11px 14px;background:rgba(255,255,255,.04);
-  border:1px solid var(--border2);border-radius:var(--r2);
-  color:var(--text);font-size:14px;outline:none;font-family:inherit;
-  transition:border-color .2s,background .2s;
+/* ─────────────────────────────────────
+   INVOICE BANNER
+───────────────────────────────────── */
+.inv-banner{
+  position:relative; overflow:hidden;
+  background:linear-gradient(135deg,rgba(37,99,235,.14) 0%,rgba(30,58,138,.1) 100%);
+  border:1px solid rgba(37,99,235,.22); border-radius:var(--r);
+  padding:clamp(18px,4vw,24px); margin-bottom:14px;
 }
-.field input:focus,.field select:focus,.field textarea:focus{
-  border-color:var(--blue3);background:rgba(37,99,235,.06);
+.inv-banner::before{
+  content:''; position:absolute; top:-40px; right:-40px;
+  width:120px; height:120px; border-radius:50%;
+  background:rgba(37,99,235,.07); pointer-events:none;
 }
-.field select option{background:var(--bg2);color:var(--text);}
-.field textarea{resize:vertical;min-height:80px;}
-.field-note{font-size:11px;color:var(--muted);margin-top:3px;}
+.inv-num-tag{ font-size:11px; font-weight:800; color:var(--cyan); letter-spacing:.8px; text-transform:uppercase; margin-bottom:4px; }
+.inv-service{ font-size:clamp(16px,4vw,20px); font-weight:800; margin-bottom:14px; }
+.inv-meta-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
+  gap:12px;
+}
+.inv-meta-cell{ display:flex; flex-direction:column; gap:3px; }
+.inv-meta-lbl{ font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+.inv-meta-val{ font-size:14px; font-weight:700; }
+.inv-amount{
+  font-size:clamp(24px,6vw,32px); font-weight:800;
+  background:linear-gradient(135deg,var(--blue3),var(--cyan));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
 
-/* ══════════════════════════════════
+/* ─────────────────────────────────────
+   FORM FIELDS
+───────────────────────────────────── */
+.fg{ display:grid; gap:13px; }
+.fg-2{ grid-template-columns:1fr 1fr; }
+.fg-3{ grid-template-columns:1fr 1fr 1fr; }
+.fld{ display:flex; flex-direction:column; gap:5px; }
+.fld label{
+  font-size:11px; font-weight:700; color:var(--sub);
+  letter-spacing:.5px; text-transform:uppercase;
+}
+.fld input, .fld select, .fld textarea{
+  padding:clamp(9px,2.5vw,12px) 14px;
+  background:rgba(255,255,255,.04); border:1px solid var(--b2);
+  border-radius:var(--r2); color:var(--text);
+  font-size:clamp(13px,3vw,14px); transition:border-color .2s,background .2s;
+  /* min tap target */
+  min-height:44px;
+}
+.fld input:focus, .fld select:focus, .fld textarea:focus{
+  border-color:var(--blue3); background:rgba(37,99,235,.07);
+}
+/* prevent iOS zoom (≥16px font) */
+@media(max-width:767px){
+  .fld input, .fld select, .fld textarea{ font-size:16px; }
+}
+.fld select option{ background:var(--bg2); }
+.fld textarea{ resize:vertical; min-height:76px; }
+.fld-note{ font-size:11px; color:var(--muted); }
+
+/* ─────────────────────────────────────
    BUTTONS
-══════════════════════════════════ */
+───────────────────────────────────── */
 .btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  padding:12px 24px;border-radius:var(--r2);border:none;
-  cursor:pointer;font-size:14px;font-weight:600;
-  transition:all .2s;min-height:44px;font-family:inherit;
-  text-decoration:none;
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  padding:clamp(10px,2.5vw,13px) clamp(16px,4vw,24px);
+  border-radius:var(--r2); cursor:pointer;
+  font-size:clamp(13px,3vw,14px); font-weight:600;
+  transition:all .2s; min-height:44px;
+  border:1px solid transparent;
 }
 .btn-primary{
-  background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;
-  box-shadow:0 4px 20px rgba(37,99,235,.35);
+  background:linear-gradient(135deg,var(--blue),var(--blue2)); color:#fff;
+  box-shadow:0 4px 18px rgba(37,99,235,.35);
 }
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 30px rgba(37,99,235,.5);}
-.btn-primary:active{transform:translateY(0);}
-.btn-outline{
-  background:transparent;border:1px solid var(--border2);color:var(--text);
-}
-.btn-outline:hover{background:var(--surface2);border-color:var(--blue3);}
-.btn-ghost{background:var(--surface2);border:1px solid var(--border);color:var(--text);}
-.btn-ghost:hover{background:rgba(255,255,255,.1);}
-.btn-green{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--green);}
-.btn-red{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--red);}
-.btn-sm{padding:7px 14px;font-size:12px;min-height:34px;}
-.btn-lg{padding:15px 32px;font-size:15px;}
-.btn-full{width:100%;}
-.btn-icon{width:36px;height:36px;padding:0;border-radius:var(--r3);}
-.btn[disabled]{opacity:.5;cursor:not-allowed;transform:none!important;}
+.btn-primary:hover{ transform:translateY(-2px); box-shadow:0 8px 28px rgba(37,99,235,.5); }
+.btn-primary:active{ transform:none; }
+.btn-outline{ border-color:var(--b2); color:var(--text); }
+.btn-outline:hover{ background:var(--surf2); border-color:var(--blue3); }
+.btn-ghost{ background:var(--surf2); border-color:var(--b); color:var(--text); }
+.btn-ghost:hover{ background:rgba(255,255,255,.09); }
+.btn-full{ width:100%; }
+.btn-sm{ padding:7px 14px; font-size:12px; min-height:36px; }
+.btn-lg{ padding:clamp(13px,3vw,16px) clamp(20px,5vw,32px); font-size:clamp(14px,3vw,15px); }
+.btn[disabled]{ opacity:.5; cursor:not-allowed; transform:none !important; pointer-events:none; }
 
-/* ══════════════════════════════════
-   INVOICE CARD (Step 1)
-══════════════════════════════════ */
-.invoice-banner{
-  background:linear-gradient(135deg,rgba(37,99,235,.15),rgba(56,189,248,.08));
-  border:1px solid rgba(37,99,235,.2);border-radius:var(--r);padding:24px;
-  margin-bottom:20px;position:relative;overflow:hidden;
+/* ─────────────────────────────────────
+   LINE ITEMS TABLE
+───────────────────────────────────── */
+.li-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; margin-top:14px; }
+.li-table{ width:100%; border-collapse:collapse; font-size:clamp(11px,2.5vw,13px); min-width:300px; }
+.li-table th{
+  text-align:left; padding:8px 10px; font-size:10px; font-weight:700;
+  color:var(--muted); text-transform:uppercase; letter-spacing:.5px;
+  border-bottom:1px solid var(--b);
 }
-.invoice-banner::before{
-  content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;
-  border-radius:50%;background:rgba(37,99,235,.08);
+.li-table td{ padding:9px 10px; border-bottom:1px solid rgba(255,255,255,.03); }
+.li-table tr:last-child td{ border-bottom:none; }
+.li-table .total td{
+  font-weight:800; color:var(--cyan); font-size:clamp(13px,3vw,15px);
+  border-top:1px solid var(--b); border-bottom:none;
 }
-.invoice-banner::after{
-  content:'';position:absolute;bottom:-30px;left:-30px;width:100px;height:100px;
-  border-radius:50%;background:rgba(56,189,248,.06);
-}
-.inv-number{font-size:13px;color:var(--cyan);font-weight:700;letter-spacing:.5px;margin-bottom:4px;}
-.inv-title{font-size:20px;font-weight:800;margin-bottom:12px;}
-.inv-meta{display:flex;flex-wrap:wrap;gap:16px;}
-.inv-meta-item{display:flex;flex-direction:column;gap:2px;}
-.inv-meta-label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
-.inv-meta-value{font-size:14px;font-weight:600;}
-.inv-amount-big{font-size:32px;font-weight:800;
-  background:linear-gradient(135deg,var(--blue3),var(--cyan));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 
-/* ══════════════════════════════════
-   SERVICE TABLE
-══════════════════════════════════ */
-.svc-table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0;}
-.svc-table th{
-  text-align:left;padding:8px 12px;color:var(--muted);
-  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
-  border-bottom:1px solid var(--border);
-}
-.svc-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.03);}
-.svc-table tr:last-child td{border-bottom:none;}
-.svc-table .total-row td{font-weight:800;color:var(--cyan);font-size:15px;border-top:1px solid var(--border);}
-
-/* ══════════════════════════════════
+/* ─────────────────────────────────────
    PAYMENT SECTION (Step 2)
-══════════════════════════════════ */
-.pay-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+───────────────────────────────────── */
+.pay-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
 .upi-card{
-  background:linear-gradient(135deg,rgba(37,99,235,.1),rgba(30,58,138,.1));
-  border:1px solid rgba(37,99,235,.2);border-radius:var(--r);padding:22px;
+  background:linear-gradient(135deg,rgba(37,99,235,.1),rgba(30,58,138,.09));
+  border:1px solid rgba(37,99,235,.2); border-radius:var(--r);
+  padding:var(--pad-y);
 }
-.upi-label{font-size:12px;color:var(--muted2);font-weight:600;margin-bottom:4px;}
-.upi-id-row{
-  display:flex;align-items:center;gap:10px;
-  background:rgba(255,255,255,.06);border:1px solid var(--border2);
-  border-radius:var(--r2);padding:10px 14px;margin:8px 0 14px;
+.upi-lbl{ font-size:11px; font-weight:700; color:var(--sub); text-transform:uppercase; letter-spacing:.5px; margin-bottom:5px; }
+.upi-id-box{
+  display:flex; align-items:center; gap:8px;
+  background:rgba(255,255,255,.06); border:1px solid var(--b2);
+  border-radius:var(--r2); padding:10px 13px; margin-bottom:14px;
 }
-.upi-id-text{font-family:'Courier New',monospace;font-size:14px;font-weight:700;flex:1;letter-spacing:.5px;}
-.amount-pill{
-  display:inline-flex;align-items:baseline;gap:4px;
-  background:rgba(37,99,235,.15);border:1px solid rgba(37,99,235,.25);
-  padding:8px 16px;border-radius:24px;margin:4px 0 16px;
+.upi-id-txt{ font-family:'Courier New',monospace; font-size:clamp(12px,3vw,14px); font-weight:700; flex:1; word-break:break-all; }
+.amt-pill{
+  display:inline-flex; align-items:baseline; gap:3px;
+  background:rgba(37,99,235,.14); border:1px solid rgba(37,99,235,.25);
+  padding:8px 16px; border-radius:24px; margin-bottom:14px;
 }
-.amount-cur{font-size:14px;color:var(--blue3);font-weight:700;}
-.amount-val{font-size:28px;font-weight:800;color:#fff;}
-.open-app-btn{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  width:100%;padding:12px;border-radius:var(--r2);border:none;cursor:pointer;
-  background:linear-gradient(135deg,var(--blue),var(--blue2));
-  color:#fff;font-size:13px;font-weight:700;font-family:inherit;
-  box-shadow:0 4px 16px rgba(37,99,235,.4);transition:.2s;
+.amt-cur{ font-size:13px; color:var(--blue3); font-weight:700; }
+.amt-val{ font-size:clamp(22px,5vw,28px); font-weight:800; color:#fff; }
+.open-app{
+  width:100%; padding:12px; border-radius:var(--r2);
+  background:linear-gradient(135deg,var(--blue),var(--blue2)); color:#fff;
+  font-size:13px; font-weight:700; cursor:pointer;
+  box-shadow:0 4px 16px rgba(37,99,235,.38); transition:.2s;
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  min-height:44px;
 }
-.open-app-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(37,99,235,.5);}
-.qr-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);padding:22px;text-align:center;
-}
-.qr-wrap{display:inline-flex;background:#fff;padding:12px;border-radius:10px;margin:10px 0;}
-.pay-steps{
-  background:rgba(255,255,255,.02);border:1px solid var(--border);
-  border-radius:var(--r2);padding:14px 16px;margin-top:14px;
-}
-.pay-step-item{
-  display:flex;align-items:flex-start;gap:10px;padding:6px 0;
-  font-size:12px;color:var(--muted2);
-}
-.pay-step-num{
-  width:20px;height:20px;border-radius:50%;background:rgba(37,99,235,.2);
-  border:1px solid rgba(37,99,235,.3);color:var(--blue3);
-  font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
+.open-app:hover{ transform:translateY(-2px); box-shadow:0 6px 24px rgba(37,99,235,.52); }
+.how-steps{ background:rgba(255,255,255,.025); border:1px solid var(--b); border-radius:var(--r2); padding:13px 14px; margin-top:13px; }
+.how-step{ display:flex; align-items:flex-start; gap:9px; padding:5px 0; font-size:12px; color:var(--sub); }
+.how-num{
+  width:20px; height:20px; border-radius:50%; flex-shrink:0;
+  background:rgba(37,99,235,.18); border:1px solid rgba(37,99,235,.3);
+  color:var(--blue3); font-size:10px; font-weight:800;
+  display:flex; align-items:center; justify-content:center;
 }
 
-/* ══════════════════════════════════
+.qr-card{
+  background:var(--surf); border:1px solid var(--b);
+  border-radius:var(--r); padding:var(--pad-y);
+  display:flex; flex-direction:column; align-items:center; text-align:center;
+}
+.qr-wrap{
+  background:#fff; padding:clamp(8px,2vw,12px); border-radius:10px;
+  margin:10px 0; display:inline-flex;
+}
+.divider{
+  display:flex; align-items:center; gap:10px; width:100%; margin:14px 0;
+  font-size:11px; color:var(--muted); font-weight:600;
+}
+.divider::before,.divider::after{ content:''; flex:1; height:1px; background:var(--b); }
+
+/* ─────────────────────────────────────
    UPLOAD ZONE (Step 3)
-══════════════════════════════════ */
+───────────────────────────────────── */
 .upload-zone{
-  border:2px dashed var(--border2);border-radius:var(--r);
-  padding:36px 24px;text-align:center;cursor:pointer;
-  transition:all .2s;position:relative;background:var(--surface);
+  border:2px dashed var(--b2); border-radius:var(--r);
+  padding:clamp(26px,5vw,40px) var(--pad-x);
+  text-align:center; cursor:pointer;
+  transition:all .2s; background:var(--surf); position:relative;
 }
 .upload-zone:hover,.upload-zone.drag{
-  border-color:var(--blue3);background:rgba(37,99,235,.05);
+  border-color:var(--blue3); background:rgba(37,99,235,.05);
 }
-.upload-zone .u-icon{font-size:40px;margin-bottom:10px;display:block;animation:float 3s ease infinite;}
-.upload-zone p{font-size:14px;color:var(--muted2);}
-.upload-zone small{font-size:11px;color:var(--muted);margin-top:4px;display:block;}
+.u-icon{ font-size:38px; display:block; margin-bottom:10px; animation:float 3s ease infinite; }
+.upload-zone p{ font-size:clamp(12px,3vw,14px); color:var(--sub); }
+.upload-zone small{ font-size:11px; color:var(--muted); display:block; margin-top:4px; }
 .file-chip{
-  display:inline-flex;align-items:center;gap:8px;margin-top:12px;
-  background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);
-  border-radius:24px;padding:6px 14px;font-size:12px;color:var(--green);
+  display:none; align-items:center; gap:7px; margin-top:12px;
+  background:rgba(16,185,129,.1); border:1px solid rgba(16,185,129,.25);
+  border-radius:24px; padding:6px 14px; font-size:12px; color:var(--green);
+  word-break:break-all;
 }
-#file-preview-img{
-  max-width:200px;max-height:140px;border-radius:var(--r2);
-  margin-top:12px;display:none;border:2px solid rgba(37,99,235,.2);
+#prev-img{
+  max-width:min(200px,70%); max-height:130px; border-radius:var(--r2);
+  margin:10px auto 0; display:none;
+  border:2px solid rgba(37,99,235,.2); object-fit:cover;
 }
-.utr-input-row{display:flex;gap:10px;align-items:flex-end;}
 
-/* ══════════════════════════════════
-   TRACKER
-══════════════════════════════════ */
-.tracker{
-  display:flex;align-items:flex-start;margin:20px 0;
-  position:relative;
-}
+/* ─────────────────────────────────────
+   PAYMENT STATUS TRACKER
+───────────────────────────────────── */
+.tracker{ display:flex; align-items:flex-start; position:relative; }
 .tracker::before{
-  content:'';position:absolute;top:17px;left:calc(10%);width:80%;height:2px;
-  background:var(--border);
+  content:''; position:absolute; top:16px; left:calc(12.5%);
+  width:75%; height:2px; background:var(--b); pointer-events:none;
 }
-.tracker-step{flex:1;text-align:center;position:relative;z-index:1;}
+.t-step{ flex:1; text-align:center; position:relative; z-index:1; }
 .t-dot{
-  width:34px;height:34px;border-radius:50%;border:2px solid var(--border2);
-  background:var(--bg2);display:flex;align-items:center;justify-content:center;
-  margin:0 auto 6px;font-size:13px;transition:.3s;
+  width:clamp(28px,6vw,34px); height:clamp(28px,6vw,34px);
+  border-radius:50%; border:2px solid var(--b2);
+  background:var(--bg2);
+  display:flex; align-items:center; justify-content:center;
+  font-size:clamp(11px,2.5vw,13px); margin:0 auto 6px;
+  transition:all .3s;
 }
-.tracker-step.done .t-dot{background:var(--green);border-color:var(--green);color:#fff;}
-.tracker-step.active .t-dot{
-  background:linear-gradient(135deg,var(--blue),var(--blue3));
-  border-color:var(--blue);color:#fff;box-shadow:0 0 16px rgba(37,99,235,.5);
-}
-.tracker-step.rejected .t-dot{background:var(--red);border-color:var(--red);color:#fff;}
-.t-label{font-size:10px;font-weight:600;color:var(--muted);}
-.tracker-step.done .t-label,.tracker-step.active .t-label{color:var(--text);}
+.t-step.done     .t-dot{ background:var(--green); border-color:var(--green); color:#fff; }
+.t-step.active   .t-dot{ background:linear-gradient(135deg,var(--blue),var(--blue3)); border-color:var(--blue); color:#fff; box-shadow:0 0 14px rgba(37,99,235,.45); }
+.t-step.rejected .t-dot{ background:var(--red); border-color:var(--red); color:#fff; }
+.t-lbl{ font-size:clamp(9px,2vw,11px); font-weight:600; color:var(--muted); }
+.t-step.done .t-lbl,.t-step.active .t-lbl{ color:var(--text); }
 
-/* ══════════════════════════════════
-   SUCCESS SCREEN
-══════════════════════════════════ */
-.success-screen{
-  text-align:center;padding:48px 24px;
-  background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(37,99,235,.05));
-  border:1px solid rgba(16,185,129,.2);border-radius:var(--r);
+/* ─────────────────────────────────────
+   ERROR MSG
+───────────────────────────────────── */
+.err{
+  background:rgba(239,68,68,.09); border:1px solid rgba(239,68,68,.25);
+  color:#fca5a5; border-radius:var(--r3); padding:10px 13px;
+  font-size:13px; display:none; margin-bottom:12px;
 }
-.success-icon{font-size:64px;margin-bottom:16px;display:block;animation:float 3s ease infinite;}
-.success-screen h2{font-size:24px;font-weight:800;margin-bottom:8px;}
-.success-screen p{color:var(--muted2);font-size:14px;line-height:1.7;max-width:480px;margin:0 auto 24px;}
-.ref-box{
-  background:rgba(255,255,255,.04);border:1px solid var(--border2);
-  border-radius:var(--r2);padding:16px;text-align:left;max-width:420px;margin:0 auto 24px;
-  display:grid;gap:8px;font-size:13px;
-}
-.ref-row{display:flex;justify-content:space-between;align-items:center;}
-.ref-key{color:var(--muted2);}
-.ref-val{font-weight:700;}
 
-/* ══════════════════════════════════
+/* ─────────────────────────────────────
    BADGES
-══════════════════════════════════ */
-.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
-.badge::before{content:'●';font-size:7px;}
-.badge-green{background:rgba(16,185,129,.12);color:var(--green);}
-.badge-yellow{background:rgba(245,158,11,.12);color:var(--yellow);}
-.badge-red{background:rgba(239,68,68,.12);color:var(--red);}
-.badge-blue{background:rgba(59,130,246,.12);color:var(--blue3);}
-.badge-orange{background:rgba(249,115,22,.12);color:var(--orange);}
+───────────────────────────────────── */
+.badge{ display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; }
+.badge::before{ content:'●'; font-size:7px; }
+.b-yellow{ background:rgba(251,191,36,.12); color:var(--yellow); }
+.b-green { background:rgba(16,185,129,.12); color:var(--green); }
+.b-blue  { background:rgba(96,165,250,.12); color:var(--blue3); }
+.b-red   { background:rgba(248,113,113,.12); color:var(--red); }
 
-/* ══════════════════════════════════
-   INVOICE DOWNLOAD PREVIEW
-══════════════════════════════════ */
-.invoice-download-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);padding:24px;
-}
-.dl-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
-
-/* ══════════════════════════════════
-   ERROR
-══════════════════════════════════ */
-.error-msg{
-  background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);
-  color:#fca5a5;border-radius:var(--r3);padding:10px 14px;
-  font-size:13px;display:none;margin-bottom:14px;
-}
-
-/* ══════════════════════════════════
-   DIVIDER
-══════════════════════════════════ */
-.divider{
-  display:flex;align-items:center;gap:12px;margin:20px 0;
-  font-size:12px;color:var(--muted);font-weight:600;
-}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
-
-/* ══════════════════════════════════
-   TRUST BADGES
-══════════════════════════════════ */
+/* ─────────────────────────────────────
+   TRUST ROW
+───────────────────────────────────── */
 .trust-row{
-  display:flex;align-items:center;justify-content:center;gap:20px;
-  flex-wrap:wrap;padding:16px 0;margin-top:16px;
+  display:flex; align-items:center; justify-content:center; flex-wrap:wrap;
+  gap:clamp(10px,3vw,22px); padding:14px 0; margin-top:12px;
 }
-.trust-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);}
+.trust-item{ display:flex; align-items:center; gap:5px; font-size:11px; color:var(--muted); white-space:nowrap; }
 
-/* ══════════════════════════════════
-   FOOTER
-══════════════════════════════════ */
-footer{
-  border-top:1px solid var(--border);
-  background:rgba(4,8,21,.95);
-  padding:40px 24px 24px;
-  margin-top:60px;
+/* ─────────────────────────────────────
+   SUCCESS SCREEN
+───────────────────────────────────── */
+.success{
+  text-align:center; padding:clamp(32px,6vw,52px) var(--pad-x);
+  background:linear-gradient(135deg,rgba(16,185,129,.07),rgba(37,99,235,.05));
+  border:1px solid rgba(16,185,129,.18); border-radius:var(--r);
 }
-.footer-top{
-  max-width:900px;margin:0 auto;
-  display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:32px;margin-bottom:32px;
+.s-icon{ font-size:clamp(48px,10vw,64px); display:block; margin-bottom:14px; animation:float 3s ease infinite; }
+.success h2{ font-size:clamp(18px,4.5vw,24px); font-weight:800; margin-bottom:8px; }
+.success p{ font-size:clamp(12px,3vw,14px); color:var(--sub); line-height:1.7; max-width:460px; margin:0 auto 22px; }
+.ref-box{
+  background:rgba(255,255,255,.04); border:1px solid var(--b2);
+  border-radius:var(--r2); padding:16px; text-align:left;
+  max-width:420px; margin:0 auto 22px; display:grid; gap:8px;
 }
-.footer-brand .brand-name{font-size:18px;font-weight:800;margin-bottom:6px;
-  background:linear-gradient(135deg,#fff,var(--cyan));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.footer-brand .brand-tag{font-size:11px;color:var(--muted);font-style:italic;margin-bottom:12px;}
-.footer-brand p{font-size:12px;color:var(--muted);line-height:1.7;}
-.footer-col h4{font-size:12px;font-weight:700;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:12px;}
-.footer-col a{display:block;font-size:13px;color:var(--muted);text-decoration:none;padding:3px 0;transition:color .15s;}
-.footer-col a:hover{color:var(--text);}
-.social-row{display:flex;gap:10px;margin-top:14px;}
-.social-btn{
-  width:34px;height:34px;border-radius:8px;background:var(--surface2);
-  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
-  font-size:15px;text-decoration:none;transition:.2s;
-}
-.social-btn:hover{background:rgba(37,99,235,.2);border-color:rgba(37,99,235,.3);}
-.footer-bottom{
-  max-width:900px;margin:0 auto;
-  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
-  padding-top:20px;border-top:1px solid var(--border);
-  font-size:12px;color:var(--muted);
-}
+.ref-row{ display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:13px; flex-wrap:wrap; }
+.ref-key{ color:var(--sub); }
+.ref-val{ font-weight:700; text-align:right; }
 
-/* ══════════════════════════════════
+/* ─────────────────────────────────────
    SPINNER
-══════════════════════════════════ */
-.spinner{
-  width:20px;height:20px;border:2px solid rgba(255,255,255,.2);
-  border-top-color:#fff;border-radius:50%;
-  animation:spin .7s linear infinite;display:none;
+───────────────────────────────────── */
+.spin{
+  width:18px; height:18px;
+  border:2px solid rgba(255,255,255,.25); border-top-color:#fff;
+  border-radius:50%; animation:spin .65s linear infinite; display:none;
 }
 
-/* ══════════════════════════════════
+/* ─────────────────────────────────────
    TOAST
-══════════════════════════════════ */
+───────────────────────────────────── */
 #toast{
-  position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);
-  background:rgba(15,23,42,.95);border:1px solid var(--border2);
-  color:var(--text);padding:11px 22px;border-radius:var(--r2);
-  font-size:13px;font-weight:500;z-index:9999;
-  box-shadow:0 8px 32px rgba(0,0,0,.4);
-  opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;
-  white-space:nowrap;max-width:90vw;
+  position:fixed; bottom:calc(22px + env(safe-area-inset-bottom)); left:50%;
+  transform:translateX(-50%) translateY(12px);
+  background:rgba(10,16,40,.96); border:1px solid var(--b2); color:var(--text);
+  padding:10px 20px; border-radius:var(--r2); font-size:13px; font-weight:500;
+  z-index:9999; box-shadow:var(--sh); pointer-events:none;
+  opacity:0; transition:opacity .22s,transform .22s;
+  white-space:nowrap; max-width:calc(100vw - 32px); overflow:hidden; text-overflow:ellipsis;
 }
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+#toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
 
-/* ══════════════════════════════════
-   WhatsApp FLOAT
-══════════════════════════════════ */
-.wa-float{
-  position:fixed;bottom:24px;right:20px;width:50px;height:50px;
-  background:#25d366;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-size:24px;text-decoration:none;z-index:500;
-  box-shadow:0 4px 20px rgba(37,211,102,.4);transition:.2s;
+/* ─────────────────────────────────────
+   WHATSAPP FLOAT
+───────────────────────────────────── */
+.wa{
+  position:fixed; bottom:calc(20px + env(safe-area-inset-bottom)); right:16px;
+  width:50px; height:50px; border-radius:50%; background:#25d366;
+  display:flex; align-items:center; justify-content:center; font-size:24px;
+  box-shadow:0 4px 20px rgba(37,211,102,.4); z-index:500; transition:.2s;
 }
-.wa-float:hover{transform:scale(1.12);}
+.wa:hover{ transform:scale(1.1); }
 
-/* ══════════════════════════════════
-   RESPONSIVE
-══════════════════════════════════ */
-@media(max-width:700px){
-  .pay-grid{grid-template-columns:1fr;}
-  .form-grid.cols2,.form-grid.cols3{grid-template-columns:1fr;}
-  .footer-top{grid-template-columns:1fr 1fr;}
-  .footer-brand{grid-column:1/-1;}
-  .hero{padding:40px 16px 28px;}
-  .card{padding:18px;}
+/* ─────────────────────────────────────
+   STEP PANELS
+───────────────────────────────────── */
+.step{ display:none; }
+.step.on{ display:block; animation:fadeUp .4s ease both; }
+
+/* ─────────────────────────────────────
+   FOOTER
+───────────────────────────────────── */
+footer{
+  border-top:1px solid var(--b); background:rgba(3,7,17,.95);
+  padding:clamp(28px,5vw,44px) var(--pad-x) calc(20px + env(safe-area-inset-bottom));
 }
-@media(max-width:480px){
-  .footer-top{grid-template-columns:1fr;}
-  .dl-row{flex-direction:column;align-items:flex-start;}
-  .stepper{gap:0;}
-  .step-label{font-size:9px;}
+.footer-grid{
+  max-width:880px; margin:0 auto;
+  display:grid;
+  grid-template-columns:1.6fr repeat(3,1fr);
+  gap:clamp(20px,4vw,36px);
+  margin-bottom:clamp(20px,4vw,32px);
 }
+.ft-brand .ft-name{
+  font-size:18px; font-weight:800; margin-bottom:4px;
+  background:linear-gradient(120deg,#fff,var(--cyan));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.ft-brand .ft-tag{ font-size:11px; color:var(--muted); font-style:italic; margin-bottom:10px; }
+.ft-brand p{ font-size:12px; color:var(--muted); line-height:1.75; }
+.socials{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+.soc{
+  width:32px; height:32px; border-radius:8px;
+  background:var(--surf2); border:1px solid var(--b);
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; transition:.2s;
+}
+.soc:hover{ background:rgba(37,99,235,.18); border-color:rgba(37,99,235,.3); }
+.ft-col h4{ font-size:11px; font-weight:700; color:var(--sub); text-transform:uppercase; letter-spacing:.6px; margin-bottom:11px; }
+.ft-col a{ display:block; font-size:12px; color:var(--muted); padding:3px 0; transition:color .15s; }
+.ft-col a:hover{ color:var(--text); }
+.footer-bottom{
+  max-width:880px; margin:0 auto;
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  padding-top:16px; border-top:1px solid var(--b);
+  font-size:11px; color:var(--muted);
+}
+
+/* ─────────────────────────────────────
+   RESPONSIVE BREAKPOINTS
+───────────────────────────────────── */
+
+/* ≥440px: show logo tagline */
+@media(min-width:440px){ .logo-tag{ display:block; } }
+
+/* ≤720px: stack pay-grid */
+@media(max-width:720px){
+  .pay-grid{ grid-template-columns:1fr; }
+}
+
+/* ≤640px: 2-col form grids → 1-col */
+@media(max-width:640px){
+  .fg-2,.fg-3{ grid-template-columns:1fr; }
+  .footer-grid{ grid-template-columns:1fr 1fr; }
+  .ft-brand{ grid-column:1/-1; }
+}
+
+/* ≤440px: footer single column, tighten stepper labels */
+@media(max-width:440px){
+  .footer-grid{ grid-template-columns:1fr; }
+  .footer-bottom{ flex-direction:column; text-align:center; }
+}
+
+/* ≤380px: very small phones */
+@media(max-width:380px){
+  .s-lbl{ display:none; }  /* hide step labels, dots still visible */
+  .hdr{ height:52px; }
+}
+
+/* Print: hide non-essential UI */
 @media print{
-  .site-header,.stepper,.wa-float,footer,.btn,#toast{display:none!important;}
-  body{background:#fff;color:#000;}
+  .hdr,.stepper-wrap,.wa,footer,#toast,.trust-row{ display:none !important; }
+  body{ background:#fff; color:#000; }
+  .card{ border:1px solid #ddd; }
 }
-
-/* ══════════════════════════════════
-   UTILITIES
-══════════════════════════════════ */
-.flex{display:flex;}.flex-center{display:flex;align-items:center;justify-content:center;}
-.items-center{align-items:center;}.justify-between{justify-content:space-between;}
-.gap-8{gap:8px;}.gap-12{gap:12px;}.gap-16{gap:16px;}
-.mt-8{margin-top:8px;}.mt-12{margin-top:12px;}.mt-16{margin-top:16px;}.mt-20{margin-top:20px;}
-.mb-8{margin-bottom:8px;}.mb-12{margin-bottom:12px;}.mb-16{margin-bottom:16px;}
-.text-muted{color:var(--muted2);}.text-xs{font-size:11px;}.text-sm{font-size:13px;}
-.font-bold{font-weight:700;}.text-center{text-align:center;}.w-full{width:100%;}
 </style>
 </head>
 <body>
 
-<!-- ═══ HEADER ═══ -->
-<header class="site-header">
-  <a class="logo" href="#">
-    <div class="logo-mark">W</div>
+<!-- ═══════ HEADER ═══════ -->
+<header class="hdr">
+  <a class="logo" href="#" aria-label="Webistzu Home">
+    <div class="logo-mark" aria-hidden="true">W</div>
     <div>
-      <div class="logo-text">Webistzu</div>
-      <div class="logo-tagline">Webpages. Web Presence. Webistzu.</div>
+      <div class="logo-name">Webistzu</div>
+      <div class="logo-tag">Webpages. Web Presence. Webistzu.</div>
     </div>
   </a>
-  <div class="header-actions">
-    <span class="header-badge">🔒 Secure Payment</span>
+  <div class="secure-pill" aria-label="Secure payment">
+    <span aria-hidden="true">🔒</span> Secure Payment
   </div>
 </header>
 
-<!-- ═══ PAGE TOP ═══ -->
+<!-- ═══════ PAGE TOP ═══════ -->
 <div class="page-top">
-  <div class="hero animate">
-    <div class="hero-eyebrow">💳 Secure Invoice Payment</div>
-    <h1>Pay Your Invoice Securely</h1>
-    <p class="hero-tagline">Webpages. Web Presence. Webistzu.</p>
+  <div class="hero fade-up">
+    <div class="eyebrow" aria-hidden="true">💳 Secure Invoice Payment</div>
+    <h1>Pay Your Invoice</h1>
+    <p class="hero-sub">Webpages. Web Presence. Webistzu.</p>
   </div>
 
-  <!-- Stepper -->
-  <div class="stepper" id="stepper">
-    <div class="step-item active" id="si-1">
-      <div style="display:flex;flex-direction:column;align-items:center;">
-        <div class="step-dot">1</div>
-        <div class="step-label">Details</div>
+  <div class="stepper-wrap" role="navigation" aria-label="Payment steps">
+    <div class="stepper">
+      <div class="s-step active" id="si1" aria-label="Step 1: Details">
+        <div class="s-dot" aria-hidden="true">1</div>
+        <div class="s-lbl">Details</div>
       </div>
-      <div class="step-line"></div>
-    </div>
-    <div class="step-item" id="si-2">
-      <div style="display:flex;flex-direction:column;align-items:center;">
-        <div class="step-dot">2</div>
-        <div class="step-label">Payment</div>
+      <div class="s-connector" id="sc1" aria-hidden="true"></div>
+
+      <div class="s-step" id="si2" aria-label="Step 2: Payment">
+        <div class="s-dot" aria-hidden="true">2</div>
+        <div class="s-lbl">Payment</div>
       </div>
-      <div class="step-line"></div>
-    </div>
-    <div class="step-item" id="si-3">
-      <div style="display:flex;flex-direction:column;align-items:center;">
-        <div class="step-dot">3</div>
-        <div class="step-label">Confirm</div>
+      <div class="s-connector" id="sc2" aria-hidden="true"></div>
+
+      <div class="s-step" id="si3" aria-label="Step 3: Confirm">
+        <div class="s-dot" aria-hidden="true">3</div>
+        <div class="s-lbl">Confirm</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══ MAIN ═══ -->
+<!-- ═══════ MAIN ═══════ -->
 <main class="main">
 
-  <!-- ─── STEP 1: Invoice Details ─── -->
-  <div class="step-panel active" id="step1">
+  <!-- ────── STEP 1: Invoice + Client Details ────── -->
+  <section class="step on" id="s1" aria-label="Step 1: Your details">
 
-    <!-- Invoice banner -->
-    <div class="invoice-banner animate animate-delay-1">
-      <div class="inv-number" id="inv-number-display">Invoice # WBZ-2026-0001</div>
-      <div class="inv-title" id="inv-title-display">Web Development Services</div>
-      <div class="inv-meta">
-        <div class="inv-meta-item"><div class="inv-meta-label">Due Date</div><div class="inv-meta-value" id="inv-due-display">30 June 2026</div></div>
-        <div class="inv-meta-item"><div class="inv-meta-label">Status</div><div class="inv-meta-value"><span class="badge badge-yellow">Pending Payment</span></div></div>
-        <div class="inv-meta-item"><div class="inv-meta-label">Amount Due</div><div class="inv-amount-big" id="inv-amount-display">₹0</div></div>
+    <!-- Invoice summary banner -->
+    <div class="inv-banner fade-up d1">
+      <div class="inv-num-tag" id="b-num">Invoice # —</div>
+      <div class="inv-service" id="b-svc">Select an invoice below</div>
+      <div class="inv-meta-grid">
+        <div class="inv-meta-cell">
+          <div class="inv-meta-lbl">Due Date</div>
+          <div class="inv-meta-val" id="b-due">—</div>
+        </div>
+        <div class="inv-meta-cell">
+          <div class="inv-meta-lbl">Status</div>
+          <div class="inv-meta-val"><span class="badge b-yellow">Pending</span></div>
+        </div>
+        <div class="inv-meta-cell">
+          <div class="inv-meta-lbl">Amount Due</div>
+          <div class="inv-amount" id="b-amt">₹0</div>
+        </div>
       </div>
     </div>
 
-    <!-- Client info form -->
-    <div class="card animate animate-delay-2">
-      <div class="card-header">
-        <div class="card-icon">👤</div>
-        <div><div class="card-title">Your Details</div><div class="card-subtitle">Please fill in your information</div></div>
+    <!-- Invoice selector card -->
+    <div class="card fade-up d2">
+      <div class="card-hd">
+        <div class="card-ico">🧾</div>
+        <div>
+          <div class="card-ti">Invoice Details</div>
+          <div class="card-st">Select your invoice or enter amount manually</div>
+        </div>
       </div>
-      <div class="form-grid cols2">
-        <div class="field"><label>Full Name *</label><input type="text" id="f-name" placeholder="Arjun Sharma" autocomplete="name"></div>
-        <div class="field"><label>Email Address *</label><input type="email" id="f-email" placeholder="you@example.com" autocomplete="email"></div>
-        <div class="field"><label>Phone Number *</label><input type="tel" id="f-phone" placeholder="+91 98765 43210" autocomplete="tel"></div>
-        <div class="field"><label>Company / GST Name</label><input type="text" id="f-company" placeholder="Your Company Pvt Ltd"></div>
-      </div>
-    </div>
-
-    <!-- Invoice selector -->
-    <div class="card animate animate-delay-3">
-      <div class="card-header">
-        <div class="card-icon">🧾</div>
-        <div><div class="card-title">Invoice Details</div><div class="card-subtitle">Select your invoice or enter details manually</div></div>
-      </div>
-      <div class="form-grid cols2" style="margin-bottom:14px;">
-        <div class="field">
-          <label>Invoice Number *</label>
-          <select id="f-invoice" onchange="selectInvoice()">
-            <option value="">-- Select Invoice --</option>
-            <option value="WBZ-2026-0001" data-service="E-Commerce Website" data-amount="35000" data-due="30 Jun 2026">WBZ-2026-0001 — E-Commerce Website — ₹35,000</option>
-            <option value="WBZ-2026-0002" data-service="SEO & Marketing Package" data-amount="12000" data-due="15 Jul 2026">WBZ-2026-0002 — SEO Package — ₹12,000</option>
-            <option value="WBZ-2026-0003" data-service="Business Website Design" data-amount="18000" data-due="20 Jul 2026">WBZ-2026-0003 — Business Website — ₹18,000</option>
-            <option value="WBZ-2026-0004" data-service="Annual Web Hosting + SSL" data-amount="4200" data-due="31 Dec 2026">WBZ-2026-0004 — Hosting + SSL — ₹4,200</option>
-            <option value="WBZ-2026-0005" data-service="Mobile App Development" data-amount="75000" data-due="15 Aug 2026">WBZ-2026-0005 — Mobile App — ₹75,000</option>
-            <option value="custom">Enter manually…</option>
+      <div class="fg fg-2" style="margin-bottom:13px;">
+        <div class="fld">
+          <label for="f-inv">Invoice Number *</label>
+          <select id="f-inv" autocomplete="off" onchange="onInvChange()">
+            <option value="">— Select Invoice —</option>
+            <option value="WBZ-2026-0001" data-svc="E-Commerce Website Development" data-amt="35000" data-due="30 Jun 2026">WBZ-2026-0001 · E-Commerce Website · ₹35,000</option>
+            <option value="WBZ-2026-0002" data-svc="SEO & Marketing Package"          data-amt="12000" data-due="15 Jul 2026">WBZ-2026-0002 · SEO Package · ₹12,000</option>
+            <option value="WBZ-2026-0003" data-svc="Business Website Design"          data-amt="18000" data-due="20 Jul 2026">WBZ-2026-0003 · Business Website · ₹18,000</option>
+            <option value="WBZ-2026-0004" data-svc="Annual Hosting + SSL Certificate" data-amt="4200"  data-due="31 Dec 2026">WBZ-2026-0004 · Hosting + SSL · ₹4,200</option>
+            <option value="WBZ-2026-0005" data-svc="Mobile App Development"           data-amt="75000" data-due="15 Aug 2026">WBZ-2026-0005 · Mobile App · ₹75,000</option>
+            <option value="custom">— Enter amount manually —</option>
           </select>
         </div>
-        <div class="field">
-          <label>Service Description *</label>
-          <input type="text" id="f-service" placeholder="e.g. Website Development">
+        <div class="fld">
+          <label for="f-svc">Service Description *</label>
+          <input type="text" id="f-svc" placeholder="e.g. Website Development"
+                 maxlength="120" autocomplete="off" spellcheck="false">
         </div>
-        <div class="field">
-          <label>Amount (₹) *</label>
-          <input type="number" id="f-amount" placeholder="0.00" min="1" oninput="onAmountChange()">
+        <div class="fld">
+          <label for="f-amt">Amount (₹) *</label>
+          <input type="number" id="f-amt" placeholder="0" min="1" max="9999999"
+                 oninput="onAmtInput()" autocomplete="off">
         </div>
-        <div class="field">
-          <label>Due Date</label>
-          <input type="date" id="f-due">
+        <div class="fld">
+          <label for="f-due">Due Date</label>
+          <input type="date" id="f-due" autocomplete="off">
         </div>
-        <div class="field" style="grid-column:1/-1;">
-          <label>Notes / Remarks</label>
-          <input type="text" id="f-notes" placeholder="Any special instructions or project references">
+        <div class="fld" style="grid-column:1/-1;">
+          <label for="f-notes">Notes / Remarks</label>
+          <input type="text" id="f-notes" placeholder="Project reference or special instructions"
+                 maxlength="200" autocomplete="off">
         </div>
       </div>
-
-      <!-- Line items table -->
-      <div id="line-items-wrap" style="display:none;">
-        <div class="text-xs text-muted mb-8" style="font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Invoice Breakdown</div>
-        <table class="svc-table" id="line-items-table"></table>
+      <!-- Line items (auto-filled) -->
+      <div id="li-wrap" style="display:none;">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Breakdown</div>
+        <div class="li-wrap"><table class="li-table" id="li-table"></table></div>
       </div>
     </div>
 
-    <div id="step1-error" class="error-msg"></div>
-    <button class="btn btn-primary btn-full btn-lg mt-16 animate animate-delay-4" onclick="goStep2()">
+    <!-- Client details card -->
+    <div class="card fade-up d3">
+      <div class="card-hd">
+        <div class="card-ico">👤</div>
+        <div>
+          <div class="card-ti">Your Details</div>
+          <div class="card-st">Required for invoice generation</div>
+        </div>
+      </div>
+      <!-- Honeypot (anti-spam: hidden, must stay empty) -->
+      <input type="text" id="hp" name="website" style="display:none;" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+      <div class="fg fg-2">
+        <div class="fld">
+          <label for="f-name">Full Name *</label>
+          <input type="text" id="f-name" placeholder="Arjun Sharma"
+                 maxlength="80" autocomplete="name" spellcheck="false">
+        </div>
+        <div class="fld">
+          <label for="f-email">Email Address *</label>
+          <input type="email" id="f-email" placeholder="you@example.com"
+                 maxlength="120" autocomplete="email" spellcheck="false">
+        </div>
+        <div class="fld">
+          <label for="f-phone">Phone Number *</label>
+          <input type="tel" id="f-phone" placeholder="+91 98765 43210"
+                 maxlength="20" autocomplete="tel">
+        </div>
+        <div class="fld">
+          <label for="f-company">Company / GST Name</label>
+          <input type="text" id="f-company" placeholder="Your Company Pvt Ltd"
+                 maxlength="120" autocomplete="organization">
+        </div>
+      </div>
+    </div>
+
+    <div id="err1" class="err" role="alert"></div>
+    <button class="btn btn-primary btn-full btn-lg fade-up d4" style="margin-top:14px;" onclick="toStep2()">
       Continue to Payment →
     </button>
-    <div class="trust-row animate animate-delay-4">
-      <div class="trust-item">🔒 256-bit SSL Encrypted</div>
+    <div class="trust-row fade-up d4">
+      <div class="trust-item">🔒 256-bit SSL</div>
       <div class="trust-item">✅ UPI Verified</div>
       <div class="trust-item">🏦 RBI Compliant</div>
+      <div class="trust-item">🛡️ Anti-fraud</div>
     </div>
-  </div>
+  </section>
 
-  <!-- ─── STEP 2: Payment ─── -->
-  <div class="step-panel" id="step2">
-
-    <div class="card animate">
-      <div class="card-header">
-        <div class="card-icon">💳</div>
-        <div><div class="card-title">Complete Payment</div><div class="card-subtitle">Scan QR or copy UPI ID — amount pre-filled</div></div>
+  <!-- ────── STEP 2: Payment ────── -->
+  <section class="step" id="s2" aria-label="Step 2: Make payment">
+    <div class="card fade-up">
+      <div class="card-hd">
+        <div class="card-ico">💳</div>
+        <div>
+          <div class="card-ti">Complete Your Payment</div>
+          <div class="card-st">Scan QR or copy UPI ID — amount pre-filled</div>
+        </div>
       </div>
-
       <div class="pay-grid">
-        <!-- UPI panel -->
+        <!-- UPI side -->
         <div class="upi-card">
-          <div class="upi-label">Pay to UPI ID</div>
-          <div class="upi-id-row">
-            <div class="upi-id-text" id="upi-id-display">webistzu@upi</div>
-            <button class="btn btn-ghost btn-sm btn-icon" onclick="copyUPI()" title="Copy UPI ID">📋</button>
+          <div class="upi-lbl">Pay to UPI ID</div>
+          <div class="upi-id-box">
+            <span class="upi-id-txt" id="upi-txt" aria-label="UPI ID">webistzu@upi</span>
+            <button class="btn btn-ghost btn-sm" onclick="copyUPI()" aria-label="Copy UPI ID"
+                    style="padding:6px 10px;min-height:36px;border-radius:6px;flex-shrink:0;">📋</button>
           </div>
-          <div class="upi-label">Total Amount</div>
-          <div class="amount-pill">
-            <span class="amount-cur">₹</span>
-            <span class="amount-val" id="pay-amount-display">0</span>
+          <div class="upi-lbl">Amount</div>
+          <div class="amt-pill" aria-live="polite">
+            <span class="amt-cur">₹</span>
+            <span class="amt-val" id="disp-amt" aria-label="Amount to pay">0</span>
           </div>
-          <div class="upi-label mb-8" style="margin-bottom:8px;">Account Name</div>
-          <div class="text-sm font-bold mb-12" style="margin-bottom:12px;">Webistzu Technologies</div>
-          <button class="open-app-btn" id="open-upi-btn" onclick="openUPI()">
+          <div class="upi-lbl" style="margin-bottom:5px;">Pay to</div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:14px;">Webistzu Technologies</div>
+          <button class="open-app" onclick="openUPI()" aria-label="Open UPI payment app">
             📱 Open UPI App
           </button>
-          <div class="pay-steps mt-12">
-            <div class="pay-step-item"><div class="pay-step-num">1</div>Open GPay / PhonePe / Paytm</div>
-            <div class="pay-step-item"><div class="pay-step-num">2</div>Scan QR or enter UPI ID</div>
-            <div class="pay-step-item"><div class="pay-step-num">3</div>Enter amount and pay</div>
-            <div class="pay-step-item"><div class="pay-step-num">4</div>Save the payment screenshot</div>
+          <div class="how-steps" role="list" aria-label="Payment steps">
+            <div class="how-step" role="listitem"><div class="how-num">1</div>Open GPay / PhonePe / Paytm</div>
+            <div class="how-step" role="listitem"><div class="how-num">2</div>Scan QR code or enter UPI ID</div>
+            <div class="how-step" role="listitem"><div class="how-num">3</div>Verify amount and confirm</div>
+            <div class="how-step" role="listitem"><div class="how-num">4</div>Save the payment screenshot</div>
           </div>
         </div>
-        <!-- QR panel -->
+        <!-- QR side -->
         <div class="qr-card">
-          <div class="text-sm font-bold mb-8" style="margin-bottom:8px;">📷 Scan to Pay</div>
-          <div class="text-xs text-muted mb-8" style="margin-bottom:10px;">Amount auto-filled from invoice</div>
-          <div class="qr-wrap" id="qr-container"></div>
-          <div class="text-xs text-muted">Works with all UPI apps</div>
-          <div class="divider">or</div>
-          <button class="btn btn-outline btn-full btn-sm" onclick="goStep3()">
-            I've paid, submit proof →
+          <div style="font-size:14px;font-weight:700;margin-bottom:4px;">📷 Scan to Pay</div>
+          <div style="font-size:12px;color:var(--sub);margin-bottom:2px;">Amount auto-filled from invoice</div>
+          <div class="qr-wrap" id="qr-box" aria-label="UPI payment QR code"></div>
+          <div style="font-size:11px;color:var(--muted);">Works with all UPI apps</div>
+          <div class="divider">already paid?</div>
+          <button class="btn btn-outline btn-full btn-sm" onclick="toStep3()">
+            Upload payment proof →
           </button>
         </div>
       </div>
     </div>
-
-    <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;">
-      <button class="btn btn-ghost" onclick="goStep1()">← Back</button>
-      <button class="btn btn-primary" style="flex:1;" onclick="goStep3()">Next: Upload Screenshot →</button>
+    <div style="display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;">
+      <button class="btn btn-ghost" onclick="toStep1()" aria-label="Back to details">← Back</button>
+      <button class="btn btn-primary" style="flex:1;" onclick="toStep3()">Next: Upload Screenshot →</button>
     </div>
-  </div>
+  </section>
 
-  <!-- ─── STEP 3: Confirm ─── -->
-  <div class="step-panel" id="step3">
+  <!-- ────── STEP 3: Upload + Confirm ────── -->
+  <section class="step" id="s3" aria-label="Step 3: Upload payment proof">
 
-    <!-- Payment status tracker -->
-    <div class="card animate mb-16" style="margin-bottom:16px;">
-      <div class="card-header">
-        <div class="card-icon">📊</div>
-        <div><div class="card-title">Payment Status</div><div class="card-subtitle">Your payment verification progress</div></div>
+    <!-- Status tracker -->
+    <div class="card fade-up" style="margin-bottom:14px;">
+      <div class="card-hd">
+        <div class="card-ico">📊</div>
+        <div>
+          <div class="card-ti">Payment Status</div>
+          <div class="card-st">Verification usually takes 2–4 business hours</div>
+        </div>
       </div>
-      <div class="tracker" id="status-tracker">
-        <div class="tracker-step active" id="ts-1"><div class="t-dot">📤</div><div class="t-label">Submitted</div></div>
-        <div class="tracker-step" id="ts-2"><div class="t-dot">🔍</div><div class="t-label">Under Review</div></div>
-        <div class="tracker-step" id="ts-3"><div class="t-dot">✅</div><div class="t-label">Approved</div></div>
-        <div class="tracker-step" id="ts-4"><div class="t-dot">🎉</div><div class="t-label">Completed</div></div>
+      <div class="tracker" role="list" aria-label="Payment verification steps">
+        <div class="t-step active" role="listitem"><div class="t-dot">📤</div><div class="t-lbl">Submitted</div></div>
+        <div class="t-step"        role="listitem"><div class="t-dot">🔍</div><div class="t-lbl">Reviewing</div></div>
+        <div class="t-step"        role="listitem"><div class="t-dot">✅</div><div class="t-lbl">Approved</div></div>
+        <div class="t-step"        role="listitem"><div class="t-dot">🎉</div><div class="t-lbl">Completed</div></div>
       </div>
-      <div class="text-xs text-muted text-center">Verification typically takes 2–4 business hours</div>
     </div>
 
-    <div class="card animate">
-      <div class="card-header">
-        <div class="card-icon">📸</div>
-        <div><div class="card-title">Upload Payment Proof</div><div class="card-subtitle">Screenshot of your UPI payment confirmation</div></div>
+    <!-- Upload form -->
+    <div class="card fade-up">
+      <div class="card-hd">
+        <div class="card-ico">📸</div>
+        <div>
+          <div class="card-ti">Upload Payment Proof</div>
+          <div class="card-st">Screenshot of your UPI payment confirmation</div>
+        </div>
       </div>
 
-      <div class="form-grid cols2 mb-16" style="margin-bottom:16px;">
-        <div class="field">
-          <label>UTR / Transaction ID *</label>
-          <input type="text" id="f-utr" placeholder="12-digit UTR number" maxlength="50" autocomplete="off">
-          <div class="field-note">Find UTR in your UPI app payment history</div>
+      <div class="fg fg-2" style="margin-bottom:14px;">
+        <div class="fld">
+          <label for="f-utr">UTR / Transaction ID *</label>
+          <input type="text" id="f-utr" placeholder="12-digit UTR number"
+                 maxlength="50" autocomplete="off" spellcheck="false"
+                 pattern="[A-Za-z0-9]{8,50}">
+          <div class="fld-note">Find UTR in your UPI app payment history</div>
         </div>
-        <div class="field">
-          <label>Payment Date *</label>
-          <input type="date" id="f-paydate" value="">
+        <div class="fld">
+          <label for="f-paydate">Payment Date *</label>
+          <input type="date" id="f-paydate" autocomplete="off">
         </div>
-        <div class="field">
-          <label>Payment App Used</label>
-          <select id="f-payapp">
+        <div class="fld">
+          <label for="f-app">Payment App</label>
+          <select id="f-app" autocomplete="off">
             <option value="GPay">Google Pay (GPay)</option>
             <option value="PhonePe">PhonePe</option>
             <option value="Paytm">Paytm</option>
             <option value="BHIM">BHIM UPI</option>
             <option value="AmazonPay">Amazon Pay</option>
-            <option value="Bank App">Bank App (NEFT/IMPS)</option>
+            <option value="Bank App">Net Banking / IMPS</option>
             <option value="Other">Other</option>
           </select>
         </div>
-        <div class="field">
-          <label>Amount Paid (₹)</label>
-          <input type="number" id="f-paidamt" placeholder="0.00">
+        <div class="fld">
+          <label for="f-paid">Amount Paid (₹)</label>
+          <input type="number" id="f-paid" placeholder="0" min="1" max="9999999" autocomplete="off">
         </div>
       </div>
 
       <!-- Upload zone -->
-      <div class="field mb-16" style="margin-bottom:16px;">
-        <label>Payment Screenshot *</label>
-        <div class="upload-zone" id="upload-zone"
-             onclick="document.getElementById('file-input').click()"
+      <div class="fld" style="margin-bottom:14px;">
+        <label id="upload-lbl">Payment Screenshot *</label>
+        <div class="upload-zone" id="drop-zone" role="button" tabindex="0"
+             aria-label="Upload payment screenshot"
+             onclick="document.getElementById('fi').click()"
+             onkeydown="if(event.key==='Enter'||event.key===' ')document.getElementById('fi').click()"
              ondragover="event.preventDefault();this.classList.add('drag')"
              ondragleave="this.classList.remove('drag')"
-             ondrop="handleDrop(event)">
-          <span class="u-icon">📸</span>
-          <p id="upload-hint">Click to upload or drag & drop screenshot</p>
-          <small>JPG, PNG, WEBP or GIF — Max 10 MB</small>
-          <div id="file-chip" style="display:none;" class="file-chip">✅ <span id="file-chip-name"></span></div>
-          <img id="file-preview-img" src="" alt="Preview">
+             ondrop="onDrop(event)">
+          <span class="u-icon" aria-hidden="true">📸</span>
+          <p id="drop-hint">Click or drag & drop your screenshot here</p>
+          <small>JPG, PNG, WEBP, GIF — Max 10 MB</small>
+          <div class="file-chip" id="file-chip">
+            ✅ <span id="chip-name"></span>
+          </div>
+          <img id="prev-img" src="" alt="Payment screenshot preview">
         </div>
-        <input type="file" id="file-input" accept="image/*" style="display:none;" onchange="handleFile(this.files[0])">
+        <input type="file" id="fi" accept="image/jpeg,image/png,image/webp,image/gif"
+               style="display:none;" aria-hidden="true" onchange="onFile(this.files[0])">
       </div>
 
-      <div id="step3-error" class="error-msg"></div>
-
+      <div id="err3" class="err" role="alert"></div>
       <div style="display:flex;gap:12px;flex-wrap:wrap;">
-        <button class="btn btn-ghost" onclick="goStep2()">← Back</button>
-        <button class="btn btn-primary" style="flex:1;padding:14px;" onclick="submitPayment()" id="submit-btn">
-          <span id="submit-label">✅ Submit Payment Proof</span>
-          <div class="spinner" id="submit-spinner"></div>
+        <button class="btn btn-ghost" onclick="toStep2()" aria-label="Back to payment">← Back</button>
+        <button class="btn btn-primary" style="flex:1;padding:13px;" onclick="doSubmit()" id="sub-btn" aria-label="Submit payment proof">
+          <span id="sub-lbl">✅ Submit Payment Proof</span>
+          <div class="spin" id="sub-spin" aria-hidden="true"></div>
         </button>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- ─── STEP 4: Success ─── -->
-  <div class="step-panel" id="step4">
-    <div class="success-screen animate">
-      <span class="success-icon">🎉</span>
-      <h2>Payment Submitted Successfully!</h2>
-      <p>Thank you! Your payment proof has been received and saved securely. Our team will verify and send you a confirmation email within 2–4 business hours.</p>
-      <div class="ref-box" id="success-ref-box"></div>
+  <!-- ────── STEP 4: Success ────── -->
+  <section class="step" id="s4" aria-label="Payment submitted successfully">
+    <div class="success fade-up">
+      <span class="s-icon" aria-hidden="true">🎉</span>
+      <h2>Payment Submitted!</h2>
+      <p>Your payment proof has been received and saved securely. We'll verify and send a confirmation to your email within 2–4 business hours.</p>
+      <div class="ref-box" id="ref-box" aria-label="Payment reference details"></div>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-        <button class="btn btn-primary" onclick="downloadInvoice()">⬇ Download Invoice</button>
-        <button class="btn btn-outline" onclick="location.reload()">Pay Another Invoice</button>
+        <button class="btn btn-primary" onclick="dlInvoice()" aria-label="Download invoice">⬇ Download Invoice</button>
+        <button class="btn btn-outline" onclick="location.reload()" aria-label="Pay another invoice">Pay Another</button>
       </div>
     </div>
-  </div>
+  </section>
 
 </main>
 
-<!-- ═══ FOOTER ═══ -->
+<!-- ═══════ FOOTER ═══════ -->
 <footer>
-  <div class="footer-top">
-    <div class="footer-brand">
-      <div class="brand-name">Webistzu</div>
-      <div class="brand-tag">Webpages. Web Presence. Webistzu.</div>
-      <p>Professional web development &amp; digital solutions for businesses across India. Building the web, one project at a time.</p>
-      <div class="social-row">
-        <a class="social-btn" href="#" title="Instagram">📸</a>
-        <a class="social-btn" href="#" title="LinkedIn">💼</a>
-        <a class="social-btn" href="#" title="Twitter/X">🐦</a>
-        <a class="social-btn" href="#" title="YouTube">▶️</a>
-        <a class="social-btn" href="https://wa.me/919999999999" title="WhatsApp">💬</a>
+  <div class="footer-grid">
+    <div class="ft-brand">
+      <div class="ft-name">Webistzu</div>
+      <div class="ft-tag">Webpages. Web Presence. Webistzu.</div>
+      <p>Professional web development &amp; digital solutions. Building the modern web for businesses across India.</p>
+      <div class="socials" aria-label="Social media links">
+        <a class="soc" href="#" aria-label="Instagram">📸</a>
+        <a class="soc" href="#" aria-label="LinkedIn">💼</a>
+        <a class="soc" href="#" aria-label="Twitter">🐦</a>
+        <a class="soc" href="#" aria-label="YouTube">▶️</a>
+        <a class="soc" href="https://wa.me/919999999999" aria-label="WhatsApp">💬</a>
       </div>
     </div>
-    <div class="footer-col">
+    <div class="ft-col">
       <h4>Services</h4>
       <a href="#">Portfolio Website</a>
       <a href="#">Business Website</a>
       <a href="#">E-Commerce Store</a>
       <a href="#">Custom Web App</a>
       <a href="#">Hosting Plans</a>
-      <a href="#">Website Maintenance</a>
+      <a href="#">Maintenance</a>
     </div>
-    <div class="footer-col">
+    <div class="ft-col">
       <h4>Company</h4>
       <a href="#">About Us</a>
       <a href="#">Our Work</a>
       <a href="#">Pricing</a>
       <a href="#">Blog</a>
-      <a href="#">Careers</a>
       <a href="mailto:contact@webistzu.com">Contact</a>
     </div>
-    <div class="footer-col">
+    <div class="ft-col">
       <h4>Legal</h4>
-      <a href="#">Terms & Conditions</a>
+      <a href="#">Terms &amp; Conditions</a>
       <a href="#">Privacy Policy</a>
       <a href="#">Refund Policy</a>
       <a href="#">Payment Security</a>
@@ -869,399 +972,513 @@ footer{
   </div>
   <div class="footer-bottom">
     <span>© 2026 Webistzu Technologies. All rights reserved.</span>
-    <span>🔒 Payments secured by UPI &amp; RBI guidelines</span>
+    <span>🔒 Secured by UPI &amp; RBI guidelines</span>
   </div>
 </footer>
 
-<a class="wa-float" href="https://wa.me/919999999999" target="_blank" title="WhatsApp Support">💬</a>
-<div id="toast"></div>
+<a class="wa" href="https://wa.me/919999999999" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp Support">💬</a>
+<div id="toast" role="status" aria-live="polite"></div>
 
 <script>
-/* ════════════════════════════════════
-   CONFIG — Edit these for production
-════════════════════════════════════ */
-const CFG = {
+/* ═════════════════════════════════════════
+   CONFIG  ← edit for production
+═════════════════════════════════════════ */
+const CFG = Object.freeze({
   UPI_ID:   'webistzu@upi',
   UPI_NAME: 'Webistzu Technologies',
   PHONE:    '+91 99999 99999',
   EMAIL:    'payments@webistzu.com',
   COMPANY:  'Webistzu Technologies',
   GSTIN:    '27XXXXX0000X1ZX',
-  ADDRESS:  'India',
+  WA:       'https://wa.me/919999999999',
+});
+
+/* ═════════════════════════════════════════
+   STATE  (plain object, no globals leaked)
+═════════════════════════════════════════ */
+const ST = {
+  step:0, invoice:'', service:'', amount:0, due:'',
+  name:'', email:'', phone:'', company:'', notes:'',
+  utr:'', app:'GPay', paidAmt:0, payDate:'',
+  file:null, lineItems:[],
+  lastSubmit:0,          /* rate-limit timestamp */
 };
 
-/* ════════════════════════════════════
-   STATE
-════════════════════════════════════ */
-const S = {
-  step: 1,
-  invoice: '', service: '', amount: 0, due: '',
-  name: '', email: '', phone: '', company: '',
-  utr: '', payapp: '', paidamt: 0, paydate: '',
-  file: null,
-  lineItems: [],
+/* ═════════════════════════════════════════
+   PRE-BUILT LINE ITEMS
+═════════════════════════════════════════ */
+const LINE_ITEMS = {
+  'WBZ-2026-0001':[
+    {d:'E-Commerce Website Design',      q:1,r:25000},
+    {d:'Payment Gateway Integration',    q:1,r:5000},
+    {d:'Product Catalogue Setup',        q:1,r:5000},
+  ],
+  'WBZ-2026-0002':[
+    {d:'SEO Audit & Strategy Report',    q:1,r:6000},
+    {d:'On-page Optimisation',           q:1,r:3000},
+    {d:'Monthly Analytics Report',       q:1,r:3000},
+  ],
+  'WBZ-2026-0003':[
+    {d:'Business Website Design',        q:1,r:12000},
+    {d:'Content Integration',            q:1,r:3000},
+    {d:'Mobile Responsive Setup',        q:1,r:3000},
+  ],
+  'WBZ-2026-0004':[
+    {d:'cPanel Hosting (1 Year)',         q:1,r:3000},
+    {d:'SSL Certificate (1 Year)',        q:1,r:600},
+    {d:'Domain Registration',            q:1,r:600},
+  ],
+  'WBZ-2026-0005':[
+    {d:'Android App Development',        q:1,r:50000},
+    {d:'iOS App Development',            q:1,r:20000},
+    {d:'App Store Submission',           q:1,r:5000},
+  ],
 };
 
-/* Pre-built line items per invoice */
-const INV_ITEMS = {
-  'WBZ-2026-0001':[{d:'E-Commerce Website Design',q:1,r:25000},{d:'Payment Gateway Integration',q:1,r:5000},{d:'Product Catalogue Setup',q:1,r:5000}],
-  'WBZ-2026-0002':[{d:'SEO Audit & Strategy',q:1,r:6000},{d:'On-page Optimisation',q:1,r:3000},{d:'Monthly Reporting',q:1,r:3000}],
-  'WBZ-2026-0003':[{d:'Business Website Design',q:1,r:12000},{d:'Content Integration',q:1,r:3000},{d:'Mobile Responsive Setup',q:1,r:3000}],
-  'WBZ-2026-0004':[{d:'cPanel Web Hosting (1 Year)',q:1,r:3000},{d:'SSL Certificate',q:1,r:600},{d:'Domain Registration',q:1,r:600}],
-  'WBZ-2026-0005':[{d:'Android App Development',q:1,r:50000},{d:'iOS App Development',q:1,r:20000},{d:'App Store Submission',q:1,r:5000}],
-};
+/* ═════════════════════════════════════════
+   SAFE TEXT SETTER  (prevents XSS)
+═════════════════════════════════════════ */
+function setText(id, val){ const el=document.getElementById(id); if(el) el.textContent=String(val??''); }
 
-/* ════════════════════════════════════
+/* ═════════════════════════════════════════
+   VALIDATORS
+═════════════════════════════════════════ */
+function validEmail(s){ return /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(s.trim()); }
+function validPhone(s){ return /^[+\d\s\-()]{7,20}$/.test(s.trim()); }
+function validUTR(s)  { return /^[A-Za-z0-9]{6,50}$/.test(s.trim()); }
+function sanitize(s)  { return String(s).replace(/[<>"'&]/g,'').trim(); }
+
+/* ═════════════════════════════════════════
    STEP NAVIGATION
-════════════════════════════════════ */
-function setStep(n) {
-  document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('step'+n).classList.add('active');
-  ['1','2','3','4'].forEach(i=>{
-    const el = document.getElementById('si-'+i);
-    if (!el) return;
-    const dot = el.querySelector('.step-dot');
-    el.classList.remove('active','done');
-    if (parseInt(i) < n) el.classList.add('done'), dot.textContent='✓';
-    else if (parseInt(i)===n) el.classList.add('active'), dot.textContent=i;
-    else dot.textContent=i;
-  });
-  S.step = n;
+═════════════════════════════════════════ */
+function showStep(n){
+  document.querySelectorAll('.step').forEach(p=>p.classList.remove('on'));
+  document.getElementById('s'+n).classList.add('on');
+  /* stepper dots */
+  for(let i=1;i<=3;i++){
+    const si  = document.getElementById('si'+i);
+    const dot = si?.querySelector('.s-dot');
+    if(!si||!dot) continue;
+    si.classList.remove('active','done');
+    if(i<n){ si.classList.add('done'); dot.textContent='✓'; }
+    else if(i===n){ si.classList.add('active'); dot.textContent=String(i); }
+    else{ dot.textContent=String(i); }
+  }
+  /* connector lines */
+  for(let i=1;i<=2;i++){
+    const sc=document.getElementById('sc'+i);
+    if(sc) sc.classList.toggle('done', n>i);
+  }
+  ST.step=n;
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function goStep1() { setStep(1); }
+function toStep1(){ showStep(1); }
 
-function goStep2() {
-  const err = document.getElementById('step1-error');
-  err.style.display='none';
-  S.name    = document.getElementById('f-name').value.trim();
-  S.email   = document.getElementById('f-email').value.trim();
-  S.phone   = document.getElementById('f-phone').value.trim();
-  S.company = document.getElementById('f-company').value.trim();
-  S.service = document.getElementById('f-service').value.trim();
-  S.amount  = parseFloat(document.getElementById('f-amount').value)||0;
-  S.invoice = document.getElementById('f-invoice').value;
-  S.due     = document.getElementById('f-due').value;
-  if (!S.name)    { showErr('step1-error','Please enter your full name.'); return; }
-  if (!validEmail(S.email)) { showErr('step1-error','Please enter a valid email address.'); return; }
-  if (!S.phone)   { showErr('step1-error','Please enter your phone number.'); return; }
-  if (!S.service) { showErr('step1-error','Please enter the service description.'); return; }
-  if (!S.amount||S.amount<=0) { showErr('step1-error','Please enter a valid amount.'); return; }
+function toStep2(){
+  document.getElementById('err1').style.display='none';
+  /* Anti-spam honeypot */
+  if(document.getElementById('hp')?.value){ showErr('err1','Submission rejected.'); return; }
+
+  const name  = sanitize(document.getElementById('f-name')?.value  || '');
+  const email = sanitize(document.getElementById('f-email')?.value  || '');
+  const phone = sanitize(document.getElementById('f-phone')?.value  || '');
+  const svc   = sanitize(document.getElementById('f-svc')?.value    || '');
+  const amt   = parseFloat(document.getElementById('f-amt')?.value)  || 0;
+
+  if(!name)             { showErr('err1','Please enter your full name.'); return; }
+  if(name.length<2)     { showErr('err1','Name must be at least 2 characters.'); return; }
+  if(!validEmail(email)){ showErr('err1','Please enter a valid email address.'); return; }
+  if(!validPhone(phone)){ showErr('err1','Please enter a valid phone number.'); return; }
+  if(!svc)              { showErr('err1','Please select or describe the service.'); return; }
+  if(!amt||amt<=0)      { showErr('err1','Please enter a valid amount greater than ₹0.'); return; }
+  if(amt>9999999)       { showErr('err1','Amount seems too large. Please check.'); return; }
+
+  ST.name=name; ST.email=email; ST.phone=phone;
+  ST.company=sanitize(document.getElementById('f-company')?.value||'');
+  ST.notes  =sanitize(document.getElementById('f-notes')?.value  ||'');
+  ST.service=svc; ST.amount=amt;
+  ST.invoice=sanitize(document.getElementById('f-inv')?.value||'');
+  ST.due    =document.getElementById('f-due')?.value||'';
+
+  /* populate step 2 */
+  setText('upi-txt', CFG.UPI_ID);
+  setText('disp-amt', amt.toLocaleString('en-IN'));
+  document.getElementById('f-paid').value=amt;
+  document.getElementById('f-paydate').value=new Date().toISOString().slice(0,10);
+
   buildQR();
-  document.getElementById('pay-amount-display').textContent = S.amount.toLocaleString('en-IN');
-  document.getElementById('upi-id-display').textContent     = CFG.UPI_ID;
-  document.getElementById('open-upi-btn').onclick = openUPI;
-  document.getElementById('f-paidamt').value = S.amount;
-  document.getElementById('f-paydate').value = new Date().toISOString().slice(0,10);
-  setStep(2);
+  showStep(2);
 }
 
-function goStep3() { setStep(3); }
+function toStep3(){ showStep(3); }
 
-/* ════════════════════════════════════
+/* ═════════════════════════════════════════
    INVOICE SELECTOR
-════════════════════════════════════ */
-function selectInvoice() {
-  const sel = document.getElementById('f-invoice');
-  const opt = sel.options[sel.selectedIndex];
-  if (!opt||!opt.value||opt.value==='custom') {
-    document.getElementById('f-service').value='';
-    document.getElementById('f-amount').value='';
-    document.getElementById('f-due').value='';
-    document.getElementById('line-items-wrap').style.display='none';
-    updateInvBanner('','',0,'');
+═════════════════════════════════════════ */
+function onInvChange(){
+  const sel = document.getElementById('f-inv');
+  const opt = sel?.options[sel.selectedIndex];
+  if(!opt?.value||opt.value==='custom'){
+    setText('b-num','Invoice # —');
+    setText('b-svc','Enter details below');
+    setText('b-due','—');
+    setText('b-amt','₹0');
+    document.getElementById('li-wrap').style.display='none';
     return;
   }
-  const svc = opt.dataset.service||'';
-  const amt = parseFloat(opt.dataset.amount)||0;
-  const due = opt.dataset.due||'';
-  document.getElementById('f-service').value = svc;
-  document.getElementById('f-amount').value  = amt;
-  document.getElementById('f-due').value     = '';
-  updateInvBanner(opt.value, svc, amt, due);
-  buildLineItems(opt.value, amt);
-  onAmountChange();
+  const inv=opt.value, svc=opt.dataset.svc||'', amt=parseFloat(opt.dataset.amt)||0, due=opt.dataset.due||'';
+  document.getElementById('f-svc').value = svc;
+  document.getElementById('f-amt').value = amt;
+  document.getElementById('f-due').value = '';
+  setText('b-num','Invoice # '+inv);
+  setText('b-svc',svc);
+  setText('b-due',due);
+  setText('b-amt','₹'+amt.toLocaleString('en-IN'));
+  buildLineItems(inv,amt);
 }
 
-function updateInvBanner(num, svc, amt, due) {
-  document.getElementById('inv-number-display').textContent = num ? 'Invoice # '+num : 'Invoice # —';
-  document.getElementById('inv-title-display').textContent  = svc || 'Web Development Services';
-  document.getElementById('inv-amount-display').textContent = amt ? '₹'+amt.toLocaleString('en-IN') : '₹0';
-  document.getElementById('inv-due-display').textContent    = due || '—';
-}
-
-function buildLineItems(inv, total) {
-  const items = INV_ITEMS[inv];
-  const wrap  = document.getElementById('line-items-wrap');
-  const tbl   = document.getElementById('line-items-table');
-  if (!items) { wrap.style.display='none'; return; }
-  S.lineItems = items;
-  const rows = items.map(it=>`
-  <tr><td>${it.d}</td><td style="text-align:right;">${it.q}</td>
-  <td style="text-align:right;">₹${it.r.toLocaleString('en-IN')}</td>
-  <td style="text-align:right;">₹${(it.q*it.r).toLocaleString('en-IN')}</td></tr>`).join('');
-  tbl.innerHTML = `<thead><tr><th>Description</th><th style="text-align:right;">Qty</th><th style="text-align:right;">Rate</th><th style="text-align:right;">Amount</th></tr></thead>
-  <tbody>${rows}
-  <tr class="total-row"><td colspan="3" style="text-align:right;">Total</td><td style="text-align:right;">₹${total.toLocaleString('en-IN')}</td></tr></tbody>`;
+function buildLineItems(inv,total){
+  const items=LINE_ITEMS[inv];
+  const wrap=document.getElementById('li-wrap');
+  const tbl =document.getElementById('li-table');
+  if(!items||!items.length){ wrap.style.display='none'; return; }
+  ST.lineItems=items;
+  let rows='';
+  items.forEach(it=>{
+    const amt=(it.q*it.r).toLocaleString('en-IN');
+    rows+=`<tr><td>${escHTML(it.d)}</td><td style="text-align:right;">${it.q}</td>`+
+          `<td style="text-align:right;">₹${it.r.toLocaleString('en-IN')}</td>`+
+          `<td style="text-align:right;">₹${amt}</td></tr>`;
+  });
+  tbl.innerHTML=`<thead><tr><th>Description</th><th style="text-align:right">Qty</th><th style="text-align:right">Rate</th><th style="text-align:right">Amount</th></tr></thead>`+
+    `<tbody>${rows}<tr class="total"><td colspan="3" style="text-align:right;padding-right:10px;">Total</td>`+
+    `<td style="text-align:right;">₹${total.toLocaleString('en-IN')}</td></tr></tbody>`;
   wrap.style.display='block';
 }
 
-function onAmountChange() {
-  const v = parseFloat(document.getElementById('f-amount').value)||0;
-  document.getElementById('inv-amount-display').textContent = v ? '₹'+v.toLocaleString('en-IN') : '₹0';
+function onAmtInput(){
+  const v=parseFloat(document.getElementById('f-amt')?.value)||0;
+  setText('b-amt', v?'₹'+v.toLocaleString('en-IN'):'₹0');
 }
 
-/* ════════════════════════════════════
+/* ═════════════════════════════════════════
    QR CODE
-════════════════════════════════════ */
-function buildQR() {
-  const c = document.getElementById('qr-container');
-  c.innerHTML = '';
-  const link = `upi://pay?pa=${CFG.UPI_ID}&pn=${encodeURIComponent(CFG.UPI_NAME)}&am=${S.amount}&cu=INR&tn=${encodeURIComponent('Invoice '+S.invoice)}`;
-  const sz   = Math.min(Math.max(150, Math.floor(Math.min(window.innerWidth,400)*0.45)), 200);
-  try {
-    new QRCode(c, {text:link, width:sz, height:sz, colorDark:'#000', colorLight:'#fff', correctLevel:QRCode.CorrectLevel.H});
-  } catch(e) { c.innerHTML='<p style="color:var(--muted);font-size:12px;">QR unavailable</p>'; }
-}
-
-/* ════════════════════════════════════
-   UPI ACTIONS
-════════════════════════════════════ */
-function copyUPI() {
-  const t = document.createElement('textarea');
-  t.value = CFG.UPI_ID;
-  document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t);
-  showToast('UPI ID copied to clipboard!');
-}
-
-function openUPI() {
-  window.location.href = `upi://pay?pa=${CFG.UPI_ID}&pn=${encodeURIComponent(CFG.UPI_NAME)}&am=${S.amount}&cu=INR&tn=${encodeURIComponent('Invoice '+S.invoice)}`;
-}
-
-/* ════════════════════════════════════
-   FILE UPLOAD
-════════════════════════════════════ */
-function handleFile(file) {
-  if (!file) return;
-  if (file.size > 10 * 1024 * 1024) { showToast('File exceeds 10 MB limit.'); return; }
-  S.file = file;
-  document.getElementById('file-chip-name').textContent = file.name + ' (' + (file.size/1024).toFixed(0) + ' KB)';
-  document.getElementById('file-chip').style.display = 'inline-flex';
-  document.getElementById('upload-hint').textContent = 'Screenshot selected ✓';
-  const prev = document.getElementById('file-preview-img');
-  prev.src = URL.createObjectURL(file);
-  prev.style.display = 'block';
-}
-
-function handleDrop(e) {
-  e.preventDefault();
-  document.getElementById('upload-zone').classList.remove('drag');
-  const f = e.dataTransfer.files[0];
-  if (f) handleFile(f);
-}
-
-/* ════════════════════════════════════
-   SUBMIT
-════════════════════════════════════ */
-async function submitPayment() {
-  const utr    = document.getElementById('f-utr').value.trim();
-  const payapp = document.getElementById('f-payapp').value;
-  const paidamt= parseFloat(document.getElementById('f-paidamt').value)||0;
-  const paydate= document.getElementById('f-paydate').value;
-  const errEl  = document.getElementById('step3-error');
-  errEl.style.display='none';
-  if (!utr)    { showErr('step3-error','Please enter the UTR / Transaction ID.'); return; }
-  if (!paidamt){ showErr('step3-error','Please enter the amount you paid.'); return; }
-  if (!S.file) { showErr('step3-error','Please upload your payment screenshot.'); return; }
-
-  /* Loading state */
-  const btn   = document.getElementById('submit-btn');
-  const lbl   = document.getElementById('submit-label');
-  const spin  = document.getElementById('submit-spinner');
-  btn.disabled=true; lbl.textContent='Submitting…'; spin.style.display='block';
-
-  S.utr=utr; S.payapp=payapp; S.paidamt=paidamt; S.paydate=paydate;
-
-  const fd = new FormData();
-  fd.append('screenshot', S.file, S.file.name);
-  fd.append('invoice', S.invoice);
-  fd.append('utr',     utr);
-  fd.append('name',    S.name);
-  fd.append('email',   S.email);
-  fd.append('phone',   S.phone);
-  fd.append('service', S.service);
-  fd.append('amount',  paidamt);
-
-  try {
-    const res  = await fetch('upload.php', {method:'POST', body:fd});
-    const json = await res.json();
-    if (json.success) {
-      showSuccess(json);
-    } else {
-      btn.disabled=false; lbl.textContent='✅ Submit Payment Proof'; spin.style.display='none';
-      showErr('step3-error', 'Upload error: '+(json.error||'Unknown error'));
-    }
-  } catch(e) {
-    btn.disabled=false; lbl.textContent='✅ Submit Payment Proof'; spin.style.display='none';
-    showErr('step3-error','Network error. Please check your connection and try again.');
+═════════════════════════════════════════ */
+function buildQR(){
+  const box=document.getElementById('qr-box');
+  if(!box) return;
+  box.innerHTML='';
+  const link=`upi://pay?pa=${encodeURIComponent(CFG.UPI_ID)}&pn=${encodeURIComponent(CFG.UPI_NAME)}&am=${ST.amount}&cu=INR&tn=${encodeURIComponent('Invoice '+ST.invoice)}`;
+  const vw=Math.min(window.innerWidth,720);
+  const sz=Math.min(Math.max(140,Math.floor(vw*0.35)),200);
+  try{
+    new QRCode(box,{text:link,width:sz,height:sz,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
+  }catch(e){
+    box.textContent='QR unavailable — use UPI ID above';
   }
 }
 
-function showSuccess(json) {
-  const ts = new Date().toLocaleString('en-IN');
-  document.getElementById('success-ref-box').innerHTML = `
-    <div class="ref-row"><span class="ref-key">Invoice</span><span class="ref-val">${S.invoice||'N/A'}</span></div>
-    <div class="ref-row"><span class="ref-key">Service</span><span class="ref-val">${S.service}</span></div>
-    <div class="ref-row"><span class="ref-key">Amount Paid</span><span class="ref-val">₹${S.paidamt.toLocaleString('en-IN')}</span></div>
-    <div class="ref-row"><span class="ref-key">UTR / Txn ID</span><span class="ref-val">${S.utr}</span></div>
-    <div class="ref-row"><span class="ref-key">Via</span><span class="ref-val">${S.payapp}</span></div>
-    <div class="ref-row"><span class="ref-key">Submitted At</span><span class="ref-val">${ts}</span></div>
-    <div class="ref-row"><span class="ref-key">File Saved</span><span class="ref-val">${json.filename||'—'}</span></div>`;
-  setStep(4);
+/* ═════════════════════════════════════════
+   UPI HELPERS
+═════════════════════════════════════════ */
+function copyUPI(){
+  navigator.clipboard?.writeText(CFG.UPI_ID)
+    .then(()=>toast('UPI ID copied!'))
+    .catch(()=>fallbackCopy(CFG.UPI_ID));
+}
+function fallbackCopy(txt){
+  const t=document.createElement('textarea');
+  t.value=txt; t.style.cssText='position:fixed;opacity:0;';
+  document.body.appendChild(t); t.select();
+  try{ document.execCommand('copy'); toast('UPI ID copied!'); }catch(e){}
+  document.body.removeChild(t);
+}
+function openUPI(){
+  location.href=`upi://pay?pa=${encodeURIComponent(CFG.UPI_ID)}&pn=${encodeURIComponent(CFG.UPI_NAME)}&am=${ST.amount}&cu=INR&tn=${encodeURIComponent('Invoice '+ST.invoice)}`;
 }
 
-/* ════════════════════════════════════
-   INVOICE DOWNLOAD
-════════════════════════════════════ */
-function downloadInvoice() {
-  const inv   = S.invoice || 'WBZ-2026-XXXX';
-  const today = new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
-  const items = S.lineItems.length
-    ? S.lineItems.map(it=>`<tr><td>${it.d}</td><td style="text-align:center;">${it.q}</td><td style="text-align:right;">₹${it.r.toLocaleString('en-IN')}</td><td style="text-align:right;">₹${(it.q*it.r).toLocaleString('en-IN')}</td></tr>`).join('')
-    : `<tr><td>${S.service}</td><td style="text-align:center;">1</td><td style="text-align:right;">₹${S.amount.toLocaleString('en-IN')}</td><td style="text-align:right;">₹${S.amount.toLocaleString('en-IN')}</td></tr>`;
+/* ═════════════════════════════════════════
+   FILE HANDLING
+═════════════════════════════════════════ */
+const ALLOWED_TYPES=['image/jpeg','image/png','image/webp','image/gif'];
+const MAX_SIZE=10*1024*1024;
 
-  const html = `<!DOCTYPE html>
+function onFile(file){
+  if(!file) return;
+  /* client-side type check */
+  if(!ALLOWED_TYPES.includes(file.type)){
+    toast('Only JPG, PNG, WEBP or GIF allowed.'); return;
+  }
+  if(file.size>MAX_SIZE){
+    toast('File exceeds 10 MB limit.'); return;
+  }
+  /* read first 4 bytes to verify magic number */
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const bytes=new Uint8Array(e.target.result);
+    if(!validMagic(bytes,file.type)){
+      toast('Invalid file — please upload a real image.'); return;
+    }
+    ST.file=file;
+    setText('chip-name',file.name+' ('+Math.round(file.size/1024)+' KB)');
+    document.getElementById('file-chip').style.display='inline-flex';
+    setText('drop-hint','Screenshot selected ✓');
+    const prev=document.getElementById('prev-img');
+    if(prev){ prev.src=URL.createObjectURL(file); prev.style.display='block'; }
+  };
+  reader.readAsArrayBuffer(file.slice(0,8));
+}
+
+function validMagic(bytes,mime){
+  /* JPEG: FF D8 FF */
+  if(mime==='image/jpeg') return bytes[0]===0xFF&&bytes[1]===0xD8&&bytes[2]===0xFF;
+  /* PNG:  89 50 4E 47 */
+  if(mime==='image/png')  return bytes[0]===0x89&&bytes[1]===0x50&&bytes[2]===0x4E&&bytes[3]===0x47;
+  /* WEBP: 52 49 46 46 */
+  if(mime==='image/webp') return bytes[0]===0x52&&bytes[1]===0x49&&bytes[2]===0x46&&bytes[3]===0x46;
+  /* GIF:  47 49 46 38 */
+  if(mime==='image/gif')  return bytes[0]===0x47&&bytes[1]===0x49&&bytes[2]===0x46&&bytes[3]===0x38;
+  return false;
+}
+
+function onDrop(e){
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('drag');
+  const f=e.dataTransfer?.files?.[0];
+  if(f) onFile(f);
+}
+
+/* ═════════════════════════════════════════
+   SUBMIT
+═════════════════════════════════════════ */
+async function doSubmit(){
+  document.getElementById('err3').style.display='none';
+
+  /* rate limit: 1 submission per 30 s */
+  const now=Date.now();
+  if(now-ST.lastSubmit<30000){ showErr('err3','Please wait a moment before resubmitting.'); return; }
+
+  const utr    =sanitize(document.getElementById('f-utr')?.value||'');
+  const payDate=document.getElementById('f-paydate')?.value||'';
+  const app    =document.getElementById('f-app')?.value||'Other';
+  const paid   =parseFloat(document.getElementById('f-paid')?.value)||0;
+
+  if(!utr)         { showErr('err3','Please enter the UTR / Transaction ID.'); return; }
+  if(!validUTR(utr)){ showErr('err3','UTR must be 6–50 alphanumeric characters.'); return; }
+  if(!paid||paid<=0){ showErr('err3','Please enter the amount you paid.'); return; }
+  if(!payDate)      { showErr('err3','Please select the payment date.'); return; }
+  if(!ST.file)      { showErr('err3','Please upload your payment screenshot.'); return; }
+
+  /* Anti-spam honeypot */
+  if(document.getElementById('hp')?.value){ showErr('err3','Submission rejected.'); return; }
+
+  /* Loading state */
+  const btn =document.getElementById('sub-btn');
+  const lbl =document.getElementById('sub-lbl');
+  const spin=document.getElementById('sub-spin');
+  btn.disabled=true; lbl.textContent='Submitting…'; spin.style.display='block';
+  ST.lastSubmit=now;
+
+  ST.utr=utr; ST.app=app; ST.paidAmt=paid; ST.payDate=payDate;
+
+  const fd=new FormData();
+  fd.append('screenshot', ST.file, ST.file.name);
+  fd.append('invoice',    ST.invoice);
+  fd.append('utr',        utr);
+  fd.append('name',       ST.name);
+  fd.append('email',      ST.email);
+  fd.append('phone',      ST.phone);
+  fd.append('service',    ST.service);
+  fd.append('amount',     paid);
+  /* honeypot sent to server too so PHP can check */
+  fd.append('website',    '');
+
+  try{
+    const res =await fetch('upload.php',{method:'POST',body:fd});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const json=await res.json();
+    if(json.success){
+      showSuccess(json);
+    } else {
+      btn.disabled=false; lbl.textContent='✅ Submit Payment Proof'; spin.style.display='none';
+      showErr('err3','Server error: '+escHTML(json.error||'Unknown error'));
+    }
+  }catch(e){
+    btn.disabled=false; lbl.textContent='✅ Submit Payment Proof'; spin.style.display='none';
+    showErr('err3','Network error. Check your connection and try again.');
+  }
+}
+
+function showSuccess(json){
+  const ts=new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+  const box=document.getElementById('ref-box');
+  box.innerHTML=''; /* clear first */
+  const rows=[
+    ['Invoice',    ST.invoice||'N/A'],
+    ['Service',    ST.service],
+    ['Amount Paid','₹'+ST.paidAmt.toLocaleString('en-IN')],
+    ['UTR / Txn',  ST.utr],
+    ['Via',        ST.app],
+    ['Submitted',  ts],
+    ['File',       json.filename||'—'],
+  ];
+  rows.forEach(([k,v])=>{
+    const row=document.createElement('div');
+    row.className='ref-row';
+    const key=document.createElement('span'); key.className='ref-key'; key.textContent=k;
+    const val=document.createElement('span'); val.className='ref-val'; val.textContent=v;
+    row.appendChild(key); row.appendChild(val);
+    box.appendChild(row);
+  });
+  showStep(4);
+}
+
+/* ═════════════════════════════════════════
+   INVOICE DOWNLOAD
+═════════════════════════════════════════ */
+function dlInvoice(){
+  const inv   = ST.invoice||'WBZ-2026-XXXX';
+  const today = new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
+  const items = ST.lineItems.length
+    ? ST.lineItems.map(it=>`<tr><td>${escHTML(it.d)}</td><td style="text-align:center">${it.q}</td><td style="text-align:right">₹${it.r.toLocaleString('en-IN')}</td><td style="text-align:right">₹${(it.q*it.r).toLocaleString('en-IN')}</td></tr>`).join('')
+    : `<tr><td>${escHTML(ST.service)}</td><td style="text-align:center">1</td><td style="text-align:right">₹${ST.amount.toLocaleString('en-IN')}</td><td style="text-align:right">₹${ST.amount.toLocaleString('en-IN')}</td></tr>`;
+
+  const isPaid=!!ST.utr;
+  const html=`<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Invoice ${inv} — Webistzu</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Invoice ${escHTML(inv)} — Webistzu</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:Arial,Helvetica,sans-serif;color:#111;background:#fff;padding:0;}
-.page{max-width:750px;margin:0 auto;padding:40px;}
-.hdr{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:24px;border-bottom:3px solid #2563eb;margin-bottom:28px;}
-.brand{font-size:26px;font-weight:900;color:#2563eb;letter-spacing:-1px;}
-.tagline{font-size:10px;color:#64748b;margin-top:2px;}
-.company-info{font-size:11px;color:#555;line-height:1.8;margin-top:6px;}
-.inv-meta{text-align:right;}
-.inv-title{font-size:22px;font-weight:800;color:#1e3a8a;letter-spacing:1px;}
-.inv-num{font-size:13px;color:#2563eb;font-weight:700;margin-top:6px;}
-.inv-detail{font-size:12px;color:#555;margin-top:4px;line-height:1.8;}
-.status-badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;margin-top:6px;}
-.status-paid{background:#dcfce7;color:#16a34a;}
-.status-pending{background:#fef9c3;color:#ca8a04;}
-.bill-to{margin-bottom:24px;padding:16px;background:#f8fafc;border-radius:8px;border-left:3px solid #2563eb;}
-.bill-to-label{font-size:10px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
-.bill-to-name{font-size:16px;font-weight:800;color:#1e3a8a;}
-.bill-to-info{font-size:12px;color:#555;line-height:1.8;margin-top:4px;}
-table{width:100%;border-collapse:collapse;margin-bottom:20px;}
-th{background:#2563eb;color:#fff;padding:10px 14px;text-align:left;font-size:12px;font-weight:700;letter-spacing:.3px;}
-td{padding:10px 14px;border-bottom:1px solid #f0f0f0;font-size:13px;}
-.total-row td{font-weight:800;font-size:15px;color:#2563eb;border-top:2px solid #2563eb;background:#eff6ff;}
-.notes{padding:14px;background:#f0f9ff;border-radius:8px;font-size:12px;color:#555;margin-bottom:20px;border:1px solid #bae6fd;}
-.payment-info{padding:14px;background:#f0fdf4;border-radius:8px;font-size:12px;line-height:1.8;margin-bottom:20px;border:1px solid #bbf7d0;}
-.payment-info strong{color:#16a34a;}
-.ftr{text-align:center;font-size:11px;color:#94a3b8;padding-top:20px;border-top:1px solid #e5e7eb;line-height:1.8;}
-.paid-stamp{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-25deg);font-size:80px;font-weight:900;color:rgba(16,185,129,.12);letter-spacing:4px;pointer-events:none;z-index:0;white-space:nowrap;}
-@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#111;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{max-width:720px;margin:0 auto;padding:40px 36px}
+.hdr{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:22px;border-bottom:3px solid #2563eb;margin-bottom:26px}
+.brand{font-size:26px;font-weight:900;color:#2563eb;letter-spacing:-1px}
+.tagline{font-size:10px;color:#64748b;font-style:italic;margin-top:2px}
+.cinfo{font-size:11px;color:#555;line-height:1.9;margin-top:8px}
+.inv-r{text-align:right}
+.inv-ti{font-size:21px;font-weight:900;color:#1e3a8a;letter-spacing:1px}
+.inv-id{font-size:13px;font-weight:700;color:#2563eb;margin-top:5px}
+.inv-d{font-size:12px;color:#555;line-height:1.9;margin-top:3px}
+.st{display:inline-block;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;margin-top:5px}
+.st-paid{background:#dcfce7;color:#16a34a}
+.st-pend{background:#fef3c7;color:#d97706}
+.bill{padding:14px 16px;background:#f8fafc;border-left:3px solid #2563eb;border-radius:4px;margin-bottom:24px}
+.bill-l{font-size:10px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.bill-n{font-size:16px;font-weight:800;color:#1e3a8a}
+.bill-i{font-size:12px;color:#555;line-height:1.9;margin-top:3px}
+table{width:100%;border-collapse:collapse;margin-bottom:18px}
+th{background:#2563eb;color:#fff;padding:9px 12px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.3px}
+td{padding:9px 12px;border-bottom:1px solid #f1f5f9;font-size:13px}
+.tot td{font-weight:800;font-size:15px;color:#2563eb;border-top:2px solid #2563eb;border-bottom:none;background:#eff6ff}
+.pi{padding:13px 15px;border-radius:6px;font-size:12px;line-height:1.9;margin-bottom:16px}
+.pi-paid{background:#f0fdf4;border:1px solid #bbf7d0}
+.pi-pend{background:#fffbeb;border:1px solid #fde68a}
+.notes{padding:13px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:6px;font-size:12px;margin-bottom:18px}
+.ftr{text-align:center;font-size:11px;color:#94a3b8;padding-top:16px;border-top:1px solid #e5e7eb;line-height:1.9}
+@media print{body{font-size:12px}}
 </style>
 </head>
 <body>
 <div class="page">
-  <div class="paid-stamp">INVOICE</div>
-  <div class="hdr">
-    <div>
-      <div class="brand">Webistzu</div>
-      <div class="tagline">Webpages. Web Presence. Webistzu.</div>
-      <div class="company-info">${CFG.COMPANY}<br>${CFG.ADDRESS}<br>GSTIN: ${CFG.GSTIN}<br>${CFG.EMAIL} · ${CFG.PHONE}</div>
-    </div>
-    <div class="inv-meta">
-      <div class="inv-title">INVOICE</div>
-      <div class="inv-num">${inv}</div>
-      <div class="inv-detail">Date: ${today}<br>Due: ${S.due||today}</div>
-      <span class="status-badge ${S.utr?'status-paid':'status-pending'}">${S.utr?'PAID':'PENDING'}</span>
-    </div>
-  </div>
-
-  <div class="bill-to">
-    <div class="bill-to-label">Bill To</div>
-    <div class="bill-to-name">${S.name}</div>
-    <div class="bill-to-info">${S.company?S.company+'<br>':''} ${S.email}<br>${S.phone}</div>
-  </div>
-
-  <table>
-    <thead><tr><th>Description</th><th>Qty</th><th style="text-align:right;">Unit Price</th><th style="text-align:right;">Amount</th></tr></thead>
-    <tbody>
-      ${items}
-      <tr class="total-row"><td colspan="3" style="text-align:right;font-weight:800;">TOTAL DUE</td><td style="text-align:right;">₹${S.amount.toLocaleString('en-IN')}</td></tr>
-    </tbody>
-  </table>
-
-  ${S.utr?`<div class="payment-info"><strong>✅ Payment Received</strong><br>UTR/Transaction ID: <strong>${S.utr}</strong><br>Paid via: ${S.payapp||'UPI'} | Amount: ₹${(S.paidamt||S.amount).toLocaleString('en-IN')} | Date: ${S.paydate||today}</div>`:`
-  <div class="payment-info" style="background:#fefce8;border-color:#fde047;"><strong>💳 Payment Instructions</strong><br>UPI ID: <strong>${CFG.UPI_ID}</strong> | Account: ${CFG.UPI_NAME}<br>Please pay ₹${S.amount.toLocaleString('en-IN')} and share UTR to ${CFG.EMAIL}</div>`}
-
-  ${S.notes?`<div class="notes"><strong>Notes:</strong> ${S.notes}</div>`:''}
-
-  <div class="ftr">
-    Thank you for your business! · ${CFG.COMPANY}<br>
-    For support: ${CFG.EMAIL} · ${CFG.PHONE}<br>
-    This is a computer-generated invoice — no signature required.
-  </div>
+<div class="hdr">
+<div>
+<div class="brand">Webistzu</div>
+<div class="tagline">Webpages. Web Presence. Webistzu.</div>
+<div class="cinfo">${escHTML(CFG.COMPANY)}<br>${escHTML(CFG.EMAIL)} &nbsp;·&nbsp; ${escHTML(CFG.PHONE)}<br>GSTIN: ${escHTML(CFG.GSTIN)}</div>
+</div>
+<div class="inv-r">
+<div class="inv-ti">INVOICE</div>
+<div class="inv-id">${escHTML(inv)}</div>
+<div class="inv-d">Date: ${today}<br>Due: ${escHTML(ST.due||today)}</div>
+<span class="st ${isPaid?'st-paid':'st-pend'}">${isPaid?'PAID':'PAYMENT PENDING'}</span>
+</div>
+</div>
+<div class="bill">
+<div class="bill-l">Bill To</div>
+<div class="bill-n">${escHTML(ST.name)}</div>
+<div class="bill-i">${ST.company?escHTML(ST.company)+'<br>':''} ${escHTML(ST.email)}&nbsp;·&nbsp;${escHTML(ST.phone)}</div>
+</div>
+<table>
+<thead><tr><th>Description</th><th>Qty</th><th style="text-align:right">Unit Price</th><th style="text-align:right">Amount</th></tr></thead>
+<tbody>
+${items}
+<tr class="tot"><td colspan="3" style="text-align:right">TOTAL DUE</td><td style="text-align:right">₹${ST.amount.toLocaleString('en-IN')}</td></tr>
+</tbody>
+</table>
+${isPaid
+?`<div class="pi pi-paid"><strong>✅ Payment Received</strong><br>UTR / Transaction ID: <strong>${escHTML(ST.utr)}</strong><br>Paid via: ${escHTML(ST.app)} &nbsp;·&nbsp; Amount: ₹${ST.paidAmt.toLocaleString('en-IN')} &nbsp;·&nbsp; Date: ${escHTML(ST.payDate)}</div>`
+:`<div class="pi pi-pend"><strong>💳 Payment Instructions</strong><br>UPI ID: <strong>${escHTML(CFG.UPI_ID)}</strong> &nbsp;·&nbsp; Account: ${escHTML(CFG.UPI_NAME)}<br>Please pay ₹${ST.amount.toLocaleString('en-IN')} and email UTR to ${escHTML(CFG.EMAIL)}</div>`}
+${ST.notes?`<div class="notes"><strong>Notes:</strong> ${escHTML(ST.notes)}</div>`:''}
+<div class="ftr">
+Thank you for choosing ${escHTML(CFG.COMPANY)}<br>
+${escHTML(CFG.EMAIL)} &nbsp;·&nbsp; ${escHTML(CFG.PHONE)}<br>
+Computer-generated invoice — no signature required.
+</div>
 </div>
 <script>window.onload=function(){window.print();}<\/script>
-</body>
-</html>`;
+</body></html>`;
 
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([html],{type:'text/html'}));
-  a.download = inv+'-Webistzu-Invoice.html';
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
+  a.download=inv+'-Webistzu.html';
   a.click();
-  showToast('Invoice downloaded! Open in browser & Print as PDF.');
+  setTimeout(()=>URL.revokeObjectURL(a.href),60000);
+  toast('Invoice downloaded! Open in browser → Print as PDF');
 }
 
-/* ════════════════════════════════════
+/* ═════════════════════════════════════════
    HELPERS
-════════════════════════════════════ */
-function showErr(id, msg) {
-  const el = document.getElementById(id);
-  el.textContent = msg;
-  el.style.display = 'block';
-  el.scrollIntoView({behavior:'smooth',block:'center'});
+═════════════════════════════════════════ */
+function escHTML(s){
+  return String(s??'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-function validEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+function showErr(id,msg){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.textContent=msg;          /* textContent, never innerHTML */
+  el.style.display='block';
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
 
 let _tt;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;           /* textContent, never innerHTML */
   t.classList.add('show');
   clearTimeout(_tt);
-  _tt = setTimeout(()=>t.classList.remove('show'), 3500);
+  _tt=setTimeout(()=>t.classList.remove('show'),3500);
 }
 
-/* ════════════════════════════════════
+/* ═════════════════════════════════════════
    INIT
-════════════════════════════════════ */
+═════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded',()=>{
-  /* Set today as default due date */
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate()+7);
-  document.getElementById('f-due').value = tomorrow.toISOString().slice(0,10);
-  document.getElementById('f-paydate').value = new Date().toISOString().slice(0,10);
+  /* default due date = 7 days out */
+  const d=new Date(); d.setDate(d.getDate()+7);
+  const fi=document.getElementById('f-due');
+  if(fi) fi.value=d.toISOString().slice(0,10);
+  /* default pay date = today */
+  const fp=document.getElementById('f-paydate');
+  if(fp) fp.value=new Date().toISOString().slice(0,10);
 
-  /* ESC closes errors */
+  /* Enter key on step 1 → advance */
   document.addEventListener('keydown',e=>{
-    if (e.key==='Enter') {
-      if (S.step===1) goStep2();
-    }
+    if(e.key==='Enter'&&ST.step===1) toStep2();
   });
 
-  /* Show tagline on wider screens */
-  if (window.innerWidth>=600) {
-    document.querySelector('.logo-tagline').style.display='block';
-  }
+  /* Rebuild QR on resize (debounced) */
+  let resizeT;
+  window.addEventListener('resize',()=>{
+    clearTimeout(resizeT);
+    resizeT=setTimeout(()=>{ if(ST.step===2) buildQR(); },300);
+  });
 });
 </script>
 </body>
